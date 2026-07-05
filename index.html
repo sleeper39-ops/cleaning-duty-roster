@@ -2,7 +2,10 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#4AA79D">
 <title>ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ</title>
 <style>
   :root{
@@ -37,13 +40,18 @@
     --upcoming-border:#4FA3D8;
     --upcoming-ink:#0B4870;
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   body{
     margin:0;
     font-family:"Sarabun","Tahoma",sans-serif;
     background:var(--bg);
     color:var(--ink);
     padding:24px;
+    padding-top:max(24px, env(safe-area-inset-top));
+    padding-bottom:max(24px, env(safe-area-inset-bottom));
+    padding-left:max(24px, env(safe-area-inset-left));
+    padding-right:max(24px, env(safe-area-inset-right));
   }
   .wrap{max-width:1400px;margin:0 auto;}
   .toolbar{
@@ -63,6 +71,8 @@
     font-size:14px;
     font-weight:600;
     transition:transform .06s ease, box-shadow .15s ease;
+    touch-action:manipulation;
+    min-height:40px;
   }
   button:active{transform:translateY(1px);}
   .btn-main{background:var(--teal);color:#184C48;}
@@ -79,7 +89,7 @@
   .btn-ghost:hover{background:#eef7f6;}
   .btn-danger{background:var(--danger);color:var(--danger-ink);}
   .btn-danger:hover{background:var(--danger-dark);}
-  .btn-sm{padding:4px 8px;font-size:12px;border-radius:6px;}
+  .btn-sm{padding:4px 8px;font-size:12px;border-radius:6px;min-height:30px;}
 
   .banner{
     background:var(--yellow);
@@ -105,6 +115,7 @@
     background:var(--card);
     border-radius:12px;
     overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
     box-shadow:0 1px 3px rgba(0,0,0,.08);
     margin-bottom:24px;
   }
@@ -188,6 +199,7 @@
     cursor:pointer;
     white-space:pre-wrap;
     transition:background .12s ease;
+    touch-action:manipulation;
   }
   td.data-cell:hover{background:#EAFAF7;}
   td.data-cell .empty{color:#aaa;font-style:italic;font-weight:400;}
@@ -227,7 +239,7 @@
   .modal h2{margin:0 0 14px;font-size:18px;}
   .modal label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px;color:#456;}
   .modal input[type=text], .modal textarea, .modal select{
-    width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:14px;
+    width:100%;padding:10px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:16px;
   }
   .modal textarea{min-height:110px;resize:vertical;}
   .modal .row-flex{display:flex;gap:8px;align-items:center;}
@@ -252,9 +264,23 @@
     .table-card, .group-card{box-shadow:none;}
     td.data-cell{cursor:default;}
   }
+  @media (max-width:1024px){
+    body{padding:16px;padding-top:max(16px, env(safe-area-inset-top));padding-bottom:max(16px, env(safe-area-inset-bottom));}
+    .groups-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+    table{min-width:760px;}
+    th,td{padding:8px 9px;font-size:13.5px;}
+  }
   @media (max-width:640px){
-    .toolbar{justify-content:center;}
+    body{padding:12px;padding-top:max(12px, env(safe-area-inset-top));padding-bottom:max(12px, env(safe-area-inset-bottom));}
+    .toolbar{justify-content:center;gap:6px;}
+    .toolbar button{flex:1 1 auto;font-size:13px;padding:10px 10px;}
     h1.page-title{font-size:18px;}
+    .banner{font-size:14.5px;padding:10px 12px;}
+    table{min-width:640px;}
+    th,td{padding:7px 8px;font-size:13px;}
+    thead th.area-head, td.area-cell{min-width:150px;}
+    .groups-grid{grid-template-columns:1fr;}
+    .modal{padding:16px;border-radius:12px;max-height:92vh;}
   }
 </style>
 </head>
@@ -508,7 +534,54 @@ const defaultState = {
 
 let state, nextAreaId, nextGroupId;
 
-function saveState(){ /* kept only in memory for this session */ }
+/* ---------- FIREBASE PERSISTENCE (REST API, no external SDK needed) ---------- */
+// Realtime Database exposes a plain HTTPS REST API, so we talk to it directly
+// with fetch() instead of loading the firebase-*.js SDK from gstatic.com.
+// This avoids failures when that CDN is blocked/unreachable on restrictive
+// networks (a common issue on office/military networks) — only your own
+// Firebase database domain below needs to be reachable.
+const FIREBASE_DB_URL = "https://daily-duty-report-default-rtdb.asia-southeast1.firebasedatabase.app";
+// Change this if you ever need multiple independent boards in the same Firebase project.
+const STATE_PATH = "cleaningDutyRoster/state";
+const STATE_URL = `${FIREBASE_DB_URL}/${STATE_PATH}.json`;
+
+let firebaseReady = true; // optimistic; flips to false only if a request actually fails
+
+async function fetchSavedState(){
+  try{
+    const res = await fetch(STATE_URL, {method:"GET"});
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    firebaseReady = true;
+    return data; // null if nothing saved yet
+  }catch(err){
+    console.error(err);
+    firebaseReady = false;
+    toast("เชื่อมต่อฐานข้อมูลไม่สำเร็จ (ตรวจสอบอินเทอร์เน็ต) การแก้ไขจะไม่ถูกบันทึกถาวรในตอนนี้");
+    return null;
+  }
+}
+let saveTimer = null;
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    fetch(STATE_URL, {
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(state)
+    }).then(res=>{
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      firebaseReady = true;
+    }).catch(err=>{
+      console.error(err);
+      toast("บันทึกข้อมูลไปยังฐานข้อมูลไม่สำเร็จ");
+    });
+  }, 400);
+}
+function arraysEqual(a, b){
+  if(!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+  return a.every((v,i)=> v === b[i]);
+}
 function toast(msg){
   const t = document.getElementById("toast");
   t.textContent = msg;
@@ -1171,11 +1244,63 @@ document.querySelectorAll(".overlay").forEach(ov=>{
   ov.addEventListener("click", e=>{ if(e.target === ov) ov.classList.remove("open"); });
 });
 
-initDefaultStateForCurrentMonth();
-state = JSON.parse(JSON.stringify(defaultState));
-nextAreaId = Math.max(...state.areas.map(a=>a.id), 0) + 1;
-nextGroupId = Math.max(...state.groups.map(g=>g.id), 0) + 1;
-render();
+async function bootstrap(){
+  // Always compute what "this month" should look like from the rotation
+  // formula first — this is the fallback/reference used whenever there's
+  // no saved data, or whenever the saved week list has aged out (new month).
+  initDefaultStateForCurrentMonth();
+
+  const saved = await fetchSavedState();
+
+  if(saved && Array.isArray(saved.weeks) && arraysEqual(saved.weeks, defaultState.weeks)){
+    // Same set of weeks as last time (nothing rolled over) — use the saved
+    // data as-is so every manual edit (cells, names, members, banner, custom
+    // areas) survives a reload untouched.
+    state = saved;
+  }else if(saved){
+    // A new month's weeks are needed. Start from the freshly-computed
+    // rotation (guaranteed correct for the new weeks), then layer the
+    // admin's persisted edits (banner text, group names/members, area
+    // names, fixed-area text, any custom areas) back on top.
+    state = JSON.parse(JSON.stringify(defaultState));
+    if(saved.banner) state.banner = saved.banner;
+    if(Array.isArray(saved.groups) && saved.groups.length) state.groups = saved.groups;
+    const groupIds = state.groups.map(g=>g.id);
+
+    if(Array.isArray(saved.areas) && saved.areas.length){
+      const savedAreaMap = {};
+      saved.areas.forEach(a=>{ savedAreaMap[a.id] = a; });
+      state.areas = state.areas.map(freshArea=>{
+        const sa = savedAreaMap[freshArea.id];
+        if(!sa) return freshArea;
+        const merged = {...freshArea, name: sa.name || freshArea.name, type: sa.type || freshArea.type};
+        if(merged.type === "fixed"){
+          const lastVal = (Array.isArray(sa.cells) && sa.cells.length) ? sa.cells[sa.cells.length-1] : "";
+          merged.cells = state.weeks.map(()=> lastVal);
+        }
+        // rotate-type areas keep the formula-computed cells from freshArea
+        return merged;
+      });
+      // Carry over any custom areas the admin added that aren't part of the
+      // built-in rotation formula (continue their rotation/text forward).
+      saved.areas.forEach(sa=>{
+        if(!state.areas.find(a=> a.id === sa.id)){
+          const extra = {...sa};
+          resizeAreaCells(extra, groupIds, state.weeks.length);
+          state.areas.push(extra);
+        }
+      });
+    }
+  }else{
+    state = JSON.parse(JSON.stringify(defaultState));
+  }
+
+  nextAreaId = Math.max(...state.areas.map(a=>a.id), 0) + 1;
+  nextGroupId = Math.max(...state.groups.map(g=>g.id), 0) + 1;
+  render();
+  saveState();
+}
+bootstrap();
 </script>
 </body>
 </html>
