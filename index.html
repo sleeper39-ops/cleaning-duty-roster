@@ -1228,6 +1228,17 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     // sure the whole table (every column, not just what's scrolled into view)
     // is captured, while keeping everything properly sized/centered instead of
     // being left-aligned inside an oversized canvas.
+    // The @media (max-width:640px) rule collapses .groups-grid to a single
+    // column based on the actual phone viewport width — widening the
+    // container doesn't override a viewport media query. Force the
+    // multi-column layout (same as desktop) just for the capture so the
+    // saved image shows the groups side-by-side in one row, like on desktop.
+    const groupsGrid = target.querySelector("#groupsGrid, .groups-grid");
+    const prevGridCols = groupsGrid ? groupsGrid.style.gridTemplateColumns : null;
+    if(groupsGrid){
+      groupsGrid.style.gridTemplateColumns = "repeat(auto-fit, minmax(220px, 1fr))";
+    }
+
     const wideEls = [target, ...target.querySelectorAll(".table-card")];
     const restoreWide = wideEls.map(el=>({
       el,
@@ -1288,6 +1299,9 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
         el.style.overflowX = overflowX;
         el.scrollLeft = scrollLeft;
       });
+      if(groupsGrid){
+        groupsGrid.style.gridTemplateColumns = prevGridCols;
+      }
     }
   }else{
     // ----- DESKTOP: latest flow — capture off-screen so the live page never
