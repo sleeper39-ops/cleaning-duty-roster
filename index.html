@@ -33,6 +33,9 @@
     --current-bg:#FFF2BF;
     --current-border:#F0B429;
     --current-ink:#5A3F00;
+    --upcoming-bg:#E3F2FD;
+    --upcoming-border:#4FA3D8;
+    --upcoming-ink:#0B4870;
   }
   *{box-sizing:border-box;}
   body{
@@ -133,6 +136,12 @@
   }
   thead th.current-week .col-actions button{background:rgba(0,0,0,.12);color:var(--current-ink);}
   thead th.current-week .col-actions button:hover{background:rgba(0,0,0,.2);}
+  thead th.upcoming-week{
+    background:var(--upcoming-border);
+    color:#fff;
+  }
+  thead th.upcoming-week .col-actions button{background:rgba(255,255,255,.22);color:#fff;}
+  thead th.upcoming-week .col-actions button:hover{background:rgba(255,255,255,.36);}
   .today-badge{
     display:inline-block;
     font-size:10.5px;
@@ -142,9 +151,22 @@
     padding:1px 7px;
     border-radius:20px;
   }
+  .upcoming-badge{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:700;
+    background:#fff;
+    color:var(--upcoming-ink);
+    padding:1px 7px;
+    border-radius:20px;
+  }
   td.current-week-cell{
     background:var(--current-bg) !important;
     box-shadow:inset 0 0 0 2px var(--current-border);
+  }
+  td.upcoming-week-cell{
+    background:var(--upcoming-bg) !important;
+    box-shadow:inset 0 0 0 2px var(--upcoming-border);
   }
 
   tbody tr:nth-child(odd){background:#F7FCFB;}
@@ -264,7 +286,7 @@
   </div>
 
   <div class="banner">
-    <input id="bannerText" type="text" value="ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ ตื่น เวลา 06.30 น., รวมฟังคำชี้แจงเช็คยอด เวลา 07.50 น., เวลา 08.00 เคารพธงชาติ">
+    <input id="bannerText" type="text" value="ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ เวลา 06.30 น.">
   </div>
 
   <div class="table-card">
@@ -497,7 +519,7 @@
 <script>
 const defaultState = {
   lastGeneratedEnd: null,
-  banner: "ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ ตื่น เวลา 06.30 น., รวมฟังคำชี้แจงเช็คยอด เวลา 07.50 น., เวลา 08.00 เคารพธงชาติ",
+  banner: "ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ เวลา 06.30 น.",
   weeks: ["1 – 5 มิ.ย. 69","8 – 12 มิ.ย. 69","15 – 19 มิ.ย. 69","22 – 26 มิ.ย. 69","29 มิ.ย. – 3 ก.ค. 69"],
   groups: [
     {id:1, name:"กลุ่ม 1", members:["จ.ชัยฤทธิ์","จ.คำสอน","ส.ณรงค์กร","ส.กฤษณัส","ส.สรรเสริญ","ส.อนุชิต","ส.ปิยะพงษ์","จ.อนุทิน"]},
@@ -536,16 +558,20 @@ function render(){
 
   // header
   const currentIdx = getCurrentWeekIndex();
+  const upcomingIdx = getUpcomingWeekIndex(currentIdx);
   const headRow = document.getElementById("headRow");
   headRow.innerHTML = '<th class="area-head">พื้นที่รับผิดชอบ</th>';
   state.weeks.forEach((w, wi)=>{
     const th = document.createElement("th");
     const isCurrent = wi === currentIdx;
+    const isUpcoming = wi === upcomingIdx;
     if(isCurrent) th.className = "current-week";
+    else if(isUpcoming) th.className = "upcoming-week";
     th.innerHTML = `
       <div class="col-head">
         <span class="week-label">${escapeHtml(w)}</span>
         ${isCurrent ? '<span class="today-badge">📍 สัปดาห์นี้</span>' : ''}
+        ${isUpcoming ? '<span class="upcoming-badge">🔜 ใกล้ถึง</span>' : ''}
         <span class="col-actions">
           <button data-act="editweek" data-idx="${wi}">✏️</button>
           <button data-act="delweek" data-idx="${wi}">🗑️</button>
@@ -574,7 +600,7 @@ function render(){
 
     state.weeks.forEach((w, wi)=>{
       const td = document.createElement("td");
-      td.className = wi === currentIdx ? "data-cell current-week-cell" : "data-cell";
+      td.className = wi === currentIdx ? "data-cell current-week-cell" : (wi === upcomingIdx ? "data-cell upcoming-week-cell" : "data-cell");
       td.dataset.areaIdx = ai;
       td.dataset.weekIdx = wi;
       if(area.type === "rotate"){
@@ -681,6 +707,24 @@ function getCurrentWeekIndex(){
     if(range && now >= range.start && now <= range.end) return i;
   }
   return -1;
+}
+// Finds a week that's about to start within `thresholdDays` days (and hasn't
+// started yet), so users get a heads-up before their duty week arrives.
+// Skips the currently-active week since that already has its own highlight.
+function getUpcomingWeekIndex(currentIdx, thresholdDays = 2){
+  const now = new Date();
+  let bestIdx = -1, bestDiff = Infinity;
+  for(let i=0;i<state.weeks.length;i++){
+    if(i === currentIdx) continue;
+    const range = parseWeekLabelToRange(state.weeks[i]);
+    if(!range) continue;
+    const diffDays = (range.start - now) / 86400000;
+    if(diffDays >= 0 && diffDays <= thresholdDays && diffDays < bestDiff){
+      bestDiff = diffDays;
+      bestIdx = i;
+    }
+  }
+  return bestIdx;
 }
 function buildCurrentMonthWeeks(now){
   const y = now.getFullYear(), m = now.getMonth();
@@ -1102,38 +1146,32 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
   toolbar.classList.add("hide-for-capture");
   toast("กำลังสร้างรูปภาพ...");
 
-  // Find any horizontally-scrollable containers inside the target (e.g. the
-  // table wrapper) and temporarily expand them so the capture includes the
-  // FULL width (all columns), not just whatever was scrolled into view.
-  const scrollables = Array.from(target.querySelectorAll("*")).filter(el=>{
-    const cs = getComputedStyle(el);
-    return (cs.overflowX === "auto" || cs.overflowX === "scroll") && el.scrollWidth > el.clientWidth;
-  });
-  const restoreScrollables = scrollables.map(el=>({
+  // Temporarily resize the target and any horizontally-scrollable containers
+  // (e.g. the table wrapper) to their full natural content width. This makes
+  // sure the whole table (every column, not just what's scrolled into view)
+  // is captured, while keeping everything properly sized/centered instead of
+  // being left-aligned inside an oversized canvas.
+  const wideEls = [target, ...target.querySelectorAll(".table-card")];
+  const restoreWide = wideEls.map(el=>({
     el,
+    width: el.style.width,
+    maxWidth: el.style.maxWidth,
     overflow: el.style.overflow,
     overflowX: el.style.overflowX,
     scrollLeft: el.scrollLeft
   }));
-  scrollables.forEach(el=>{
+  wideEls.forEach(el=>{
     el.scrollLeft = 0;
+    el.style.maxWidth = "none";
+    el.style.width = "max-content";
     el.style.overflow = "visible";
     el.style.overflowX = "visible";
   });
 
   try{
-    // small delay so the toolbar hide + overflow changes reflow before capture
+    // small delay so the toolbar hide + width changes reflow before capture
     await new Promise(r=>setTimeout(r, 50));
-    const fullWidth = Math.max(target.scrollWidth, document.documentElement.scrollWidth);
-    const canvas = await html2canvas(target, {
-      backgroundColor:"#F2FAF8",
-      scale:2,
-      useCORS:true,
-      width: fullWidth,
-      windowWidth: fullWidth,
-      scrollX: 0,
-      scrollY: 0
-    });
+    const canvas = await html2canvas(target, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
     const dateStr = new Date().toISOString().slice(0,10);
     const filename = `ตารางเวรทำความสะอาด-${dateStr}.png`;
 
@@ -1176,7 +1214,9 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     toast("เกิดข้อผิดพลาดในการบันทึกรูปภาพ");
   }finally{
     toolbar.classList.remove("hide-for-capture");
-    restoreScrollables.forEach(({el, overflow, overflowX, scrollLeft})=>{
+    restoreWide.forEach(({el, width, maxWidth, overflow, overflowX, scrollLeft})=>{
+      el.style.width = width;
+      el.style.maxWidth = maxWidth;
       el.style.overflow = overflow;
       el.style.overflowX = overflowX;
       el.scrollLeft = scrollLeft;
