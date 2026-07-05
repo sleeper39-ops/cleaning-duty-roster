@@ -1251,29 +1251,18 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
     if(!blob){ toast("สร้างรูปภาพไม่สำเร็จ"); return; }
 
-    const file = new File([blob], filename, {type:"image/png"});
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-    // Mobile / any device that supports native share-with-files: opens the
-    // "Save Image" / "Save to Photos" sheet directly.
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      try{
-        await navigator.share({files:[file], title: filename});
-        toast("บันทึก/แชร์รูปภาพแล้ว");
-      }catch(err){
-        if(err && err.name !== "AbortError"){
-          toast("ไม่สามารถแชร์รูปภาพได้");
-        }
-      }
-    }else if(isMobile){
-      // Mobile without file-share support: open the image so the user can
-      // long-press → "Save Image" / "บันทึกรูปภาพ" to the camera roll.
+    if(isMobile){
+      // Mobile: open the image directly so the user can long-press →
+      // "Save Image" / "บันทึกรูปภาพ" to save it straight into their photo
+      // album (ม้วนฟิล์ม). No share sheet involved.
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
-      toast("เปิดรูปภาพแล้ว กดค้างที่รูปเพื่อบันทึกลงมือถือ");
+      toast("เปิดรูปภาพแล้ว กดค้างที่รูปแล้วเลือก \"บันทึกรูปภาพ\" เพื่อบันทึกลงอัลบั้ม");
       setTimeout(()=> URL.revokeObjectURL(url), 60000);
     }else{
-      // Desktop: normal file download.
+      // Desktop: normal file download straight to disk.
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
