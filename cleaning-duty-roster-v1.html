@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ</title>
+<style>
+  :root{
+    --teal:#9FE0DA;
+    --teal-dark:#5FBDB4;
+    --teal-deep:#4AA79D;
+    --yellow:#FFEBA8;
+    --yellow-line:#EAD27E;
+    --ink:#3A4750;
+    --line:#DCE9E7;
+    --bg:#F2FAF8;
+    --card:#ffffff;
+    --accent:#FFCBA1;
+    --accent-dark:#F5A868;
+    --accent-ink:#7A3B10;
+    --info:#B7DEF5;
+    --info-dark:#88C3E8;
+    --info-ink:#154566;
+    --purple:#DECBF2;
+    --purple-dark:#C1A4E3;
+    --purple-ink:#4B2E7A;
+    --warn:#FFD2C2;
+    --warn-dark:#F6AD92;
+    --warn-ink:#7A2E14;
+    --danger:#F7C2BB;
+    --danger-dark:#EE9A90;
+    --danger-ink:#8A2C20;
+    --current-bg:#FFF2BF;
+    --current-border:#F0B429;
+    --current-ink:#5A3F00;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Sarabun","Tahoma",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:24px;
+  }
+  .wrap{max-width:1400px;margin:0 auto;}
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:16px;
+    align-items:center;
+  }
+  .toolbar .spacer{flex:1;}
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+    border-radius:8px;
+    padding:9px 14px;
+    font-size:14px;
+    font-weight:600;
+    transition:transform .06s ease, box-shadow .15s ease;
+  }
+  button:active{transform:translateY(1px);}
+  .btn-main{background:var(--teal);color:#184C48;}
+  .btn-main:hover{background:var(--teal-dark);color:#0F3B38;}
+  .btn-accent{background:var(--accent);color:var(--accent-ink);}
+  .btn-accent:hover{background:var(--accent-dark);}
+  .btn-info{background:var(--info);color:var(--info-ink);}
+  .btn-info:hover{background:var(--info-dark);}
+  .btn-purple{background:var(--purple);color:var(--purple-ink);}
+  .btn-purple:hover{background:var(--purple-dark);}
+  .btn-warn{background:var(--warn);color:var(--warn-ink);}
+  .btn-warn:hover{background:var(--warn-dark);}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);}
+  .btn-ghost:hover{background:#eef7f6;}
+  .btn-danger{background:var(--danger);color:var(--danger-ink);}
+  .btn-danger:hover{background:var(--danger-dark);}
+  .btn-sm{padding:4px 8px;font-size:12px;border-radius:6px;}
+
+  .banner{
+    background:var(--yellow);
+    text-align:center;
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:16px;
+    margin-bottom:16px;
+    border:1px solid var(--yellow-line);
+  }
+  .banner input{
+    background:transparent;
+    border:none;
+    font:inherit;
+    font-weight:700;
+    text-align:center;
+    width:100%;
+  }
+  .banner input:focus{outline:2px dashed #8a8000;border-radius:4px;}
+
+  .table-card{
+    background:var(--card);
+    border-radius:12px;
+    overflow-x:auto;
+    box-shadow:0 1px 3px rgba(0,0,0,.08);
+    margin-bottom:24px;
+  }
+  table{border-collapse:collapse;width:100%;min-width:900px;}
+  th,td{border:1px solid var(--line);padding:10px 12px;vertical-align:top;font-size:14.5px;}
+  thead th{
+    background:var(--teal-deep);
+    color:#fff;
+    position:sticky;
+    top:0;
+    z-index:2;
+    font-weight:700;
+  }
+  thead th.area-head{
+    background:var(--teal-dark);
+    text-align:left;
+    min-width:220px;
+    color:#184C48;
+  }
+  th .col-head{display:flex;flex-direction:column;gap:6px;align-items:center;}
+  th .col-head .week-label{font-size:13.5px;}
+  th .col-head .col-actions{display:flex;gap:4px;}
+  th .col-actions button{background:rgba(255,255,255,.18);color:#fff;border-radius:5px;padding:2px 6px;font-size:11px;}
+  th .col-actions button:hover{background:rgba(255,255,255,.32);}
+
+  thead th.current-week{
+    background:var(--current-border);
+    color:var(--current-ink);
+  }
+  thead th.current-week .col-actions button{background:rgba(0,0,0,.12);color:var(--current-ink);}
+  thead th.current-week .col-actions button:hover{background:rgba(0,0,0,.2);}
+  .today-badge{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:700;
+    background:#fff;
+    color:var(--current-ink);
+    padding:1px 7px;
+    border-radius:20px;
+  }
+  td.current-week-cell{
+    background:var(--current-bg) !important;
+    box-shadow:inset 0 0 0 2px var(--current-border);
+  }
+
+  tbody tr:nth-child(odd){background:#F7FCFB;}
+  td.area-cell{
+    font-weight:600;
+    position:relative;
+    min-width:220px;
+  }
+  .area-cell .area-row{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
+  .area-cell .area-actions{display:flex;gap:4px;flex-shrink:0;}
+  .area-cell .area-actions button{padding:2px 6px;font-size:11px;border-radius:5px;}
+  .area-tag{
+    display:inline-block;
+    margin-top:4px;
+    font-size:11px;
+    font-weight:600;
+    padding:2px 6px;
+    border-radius:5px;
+    background:#DFF5F2;
+    color:#1F6E67;
+  }
+  .area-tag.fixed{background:#FFEBD9;color:var(--accent-ink);}
+
+  td.data-cell{
+    text-align:center;
+    cursor:pointer;
+    white-space:pre-wrap;
+    transition:background .12s ease;
+  }
+  td.data-cell:hover{background:#EAFAF7;}
+  td.data-cell .empty{color:#aaa;font-style:italic;font-weight:400;}
+
+  .add-row-btn-cell{text-align:center;padding:14px;}
+
+  /* Group legend */
+  .groups-title{font-size:18px;font-weight:700;margin:8px 0 12px;text-decoration:underline;text-underline-offset:4px;}
+  .groups-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+    margin-bottom:24px;
+  }
+  .group-card{
+    background:var(--card);
+    border-radius:12px;
+    padding:14px 16px;
+    box-shadow:0 1px 3px rgba(0,0,0,.08);
+    border-top:4px solid var(--teal);
+  }
+  .group-card h3{margin:0 0 8px;font-size:15px;text-decoration:underline;text-underline-offset:3px;}
+  .group-card ul{margin:0;padding-left:18px;font-size:14px;line-height:1.7;}
+  .group-card .gc-actions{margin-top:10px;display:flex;gap:6px;}
+
+  /* Modal */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,30,30,.45);
+    display:none;align-items:center;justify-content:center;z-index:50;padding:16px;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:#fff;border-radius:14px;padding:22px;width:100%;max-width:520px;
+    max-height:88vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.25);
+  }
+  .modal h2{margin:0 0 14px;font-size:18px;}
+  .modal label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px;color:#456;}
+  .modal input[type=text], .modal textarea, .modal select{
+    width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:14px;
+  }
+  .modal textarea{min-height:110px;resize:vertical;}
+  .modal .row-flex{display:flex;gap:8px;align-items:center;}
+  .modal .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
+  .modal .member-line{display:flex;gap:6px;margin-bottom:6px;}
+  .modal .member-line input{flex:1;}
+  .radio-group{display:flex;gap:14px;font-size:14px;margin-top:4px;}
+  .radio-group label{display:flex;align-items:center;gap:5px;font-weight:400;margin:0;}
+  .hint{font-size:12px;color:#789;margin-top:4px;}
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:#1f2a2a;color:#fff;padding:10px 18px;border-radius:8px;
+    font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:99;
+  }
+  .toast.show{opacity:1;}
+
+  .hide-for-capture{display:none !important;}
+  @media print{
+    .toolbar, .groups-actions-bar{display:none !important;}
+    body{background:#fff;padding:0;}
+    .table-card, .group-card{box-shadow:none;}
+    td.data-cell{cursor:default;}
+  }
+  @media (max-width:640px){
+    .toolbar{justify-content:center;}
+    h1.page-title{font-size:18px;}
+  }
+</style>
+</head>
+<body>
+<div id="fatalError" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:#c0392b;color:#fff;padding:14px 18px;font-family:sans-serif;font-size:13px;line-height:1.5;"></div>
+<script>
+  window.addEventListener("error", function(e){
+    var box = document.getElementById("fatalError");
+    if(box){
+      box.style.display = "block";
+      box.textContent = "เกิดข้อผิดพลาดในหน้านี้: " + (e.message || e) + " (บรรทัด " + e.lineno + ")";
+    }
+  });
+</script>
+<div class="wrap">
+
+  <div class="toolbar">
+    <button class="btn-main" id="btnEditWeeks">🗓️ แก้ไขสัปดาห์</button>
+    <button class="btn-main" id="btnManageGroups">👥 จัดการกลุ่มเวร</button>
+    <button class="btn-accent" id="btnAddArea">➕ เพิ่มพื้นที่</button>
+    <div class="spacer"></div>
+    <button class="btn-info" id="btnSaveImage">🖼️ บันทึกรูปภาพ</button>
+  </div>
+
+  <div class="banner">
+    <input id="bannerText" type="text" value="ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ ตื่น เวลา 06.30 น., รวมฟังคำชี้แจงเช็คยอด เวลา 07.50 น., เวลา 08.00 เคารพธงชาติ">
+  </div>
+
+  <div class="table-card">
+    <table id="rosterTable">
+      <thead>
+        <tr id="headRow">
+          <th class="area-head">พื้นที่รับผิดชอบ</th><th>
+      <div class="col-head">
+        <span class="week-label">18 – 22 พ.ค. 69</span>
+        <span class="col-actions">
+          <button data-act="editweek" data-idx="0">✏️</button>
+          <button data-act="delweek" data-idx="0">🗑️</button>
+        </span>
+      </div></th><th>
+      <div class="col-head">
+        <span class="week-label">25 – 29 พ.ค. 69</span>
+        <span class="col-actions">
+          <button data-act="editweek" data-idx="1">✏️</button>
+          <button data-act="delweek" data-idx="1">🗑️</button>
+        </span>
+      </div></th><th>
+      <div class="col-head">
+        <span class="week-label">1 – 5 มิ.ย. 69</span>
+        <span class="col-actions">
+          <button data-act="editweek" data-idx="2">✏️</button>
+          <button data-act="delweek" data-idx="2">🗑️</button>
+        </span>
+      </div></th><th>
+      <div class="col-head">
+        <span class="week-label">8 – 12 มิ.ย. 69</span>
+        <span class="col-actions">
+          <button data-act="editweek" data-idx="3">✏️</button>
+          <button data-act="delweek" data-idx="3">🗑️</button>
+        </span>
+      </div></th><th>
+      <div class="col-head">
+        <span class="week-label">15 – 19 มิ.ย. 69</span>
+        <span class="col-actions">
+          <button data-act="editweek" data-idx="4">✏️</button>
+          <button data-act="delweek" data-idx="4">🗑️</button>
+        </span>
+      </div></th><th>
+      <div class="col-head">
+        <span class="week-label">22 – 26 มิ.ย. 69</span>
+        <span class="col-actions">
+          <button data-act="editweek" data-idx="5">✏️</button>
+          <button data-act="delweek" data-idx="5">🗑️</button>
+        </span>
+      </div></th><th>
+      <div class="col-head">
+        <span class="week-label">29 มิ.ย. – 3 ก.ค. 69</span>
+        <span class="col-actions">
+          <button data-act="editweek" data-idx="6">✏️</button>
+          <button data-act="delweek" data-idx="6">🗑️</button>
+        </span>
+      </div></th>
+        </tr>
+      </thead>
+      <tbody id="bodyTbl"><tr><td class="area-cell">
+      <div class="area-row">
+        <div>ลานจอดรถหน้าต้นโพธิ์ตลอดแนว พระพุทธ, ม้าหินอ่อน
+          <div><span class="area-tag ">หมุนเวียนกลุ่ม</span></div>
+        </div>
+        <div class="area-actions">
+          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="0">✏️</button>
+        </div>
+      </div></td><td class="data-cell" data-area-idx="0" data-week-idx="0"><strong>กลุ่ม 1</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="1"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="2"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="3"><strong>กลุ่ม 2</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="4"><strong>กลุ่ม 1</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="5"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="6"><strong>กลุ่ม 3</strong></td></tr><tr><td class="area-cell">
+      <div class="area-row">
+        <div>ห้องกาแฟ, ห้องน้ำด้านใน
+          <div><span class="area-tag ">หมุนเวียนกลุ่ม</span></div>
+        </div>
+        <div class="area-actions">
+          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="1">✏️</button>
+        </div>
+      </div></td><td class="data-cell" data-area-idx="1" data-week-idx="0"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="1"><strong>กลุ่ม 2</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="2"><strong>กลุ่ม 1</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="3"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="4"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="5"><strong>กลุ่ม 2</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="6"><strong>กลุ่ม 1</strong></td></tr><tr><td class="area-cell">
+      <div class="area-row">
+        <div>ระเบียงด้านหน้า, ห้องประชุม
+          <div><span class="area-tag ">หมุนเวียนกลุ่ม</span></div>
+        </div>
+        <div class="area-actions">
+          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="2">✏️</button>
+        </div>
+      </div></td><td class="data-cell" data-area-idx="2" data-week-idx="0"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="1"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="2"><strong>กลุ่ม 2</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="3"><strong>กลุ่ม 1</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="4"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="5"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="6"><strong>กลุ่ม 2</strong></td></tr><tr><td class="area-cell">
+      <div class="area-row">
+        <div>โต๊ะทานข้าวด้านหลัง พื้นที่ด้านหลังซักผ้า, ล้างจาน, ห้องอาหาร
+          <div><span class="area-tag fixed">ข้อความคงที่</span></div>
+        </div>
+        <div class="area-actions">
+          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="3">✏️</button>
+        </div>
+      </div></td><td class="data-cell" data-area-idx="3" data-week-idx="0">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="1">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="2">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="3">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="4">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="5">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="6">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td></tr><tr><td class="area-cell">
+      <div class="area-row">
+        <div>ห้องโถงหน้าห้อง ผบช./ ห้องน้ำห้องส้วม ผบช. ชั้น 1, 3
+          <div><span class="area-tag fixed">ข้อความคงที่</span></div>
+        </div>
+        <div class="area-actions">
+          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="4">✏️</button>
+        </div>
+      </div></td><td class="data-cell" data-area-idx="4" data-week-idx="0">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="1">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="2">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="3">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="4">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="5">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="6">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td></tr><tr><td class="area-cell">
+      <div class="area-row">
+        <div>ห้องทำงาน ผบ., รอง ผบ.,
+          <div><span class="area-tag fixed">ข้อความคงที่</span></div>
+        </div>
+        <div class="area-actions">
+          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="5">✏️</button>
+        </div>
+      </div></td><td class="data-cell" data-area-idx="5" data-week-idx="0">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="1">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="2">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="3">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="4">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="5">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="6">เสมียนเวร นายทหารเวร</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="groups-title">กลุ่มรายชื่อปฏิบัติเวร</div>
+  <div class="groups-grid" id="groupsGrid"><div class="group-card">
+      <h3>กลุ่ม 1</h3>
+      <ul><li>จ.ชัยฤทธิ์</li><li>จ.คำสอน</li><li>ส.ณรงค์กร</li><li>ส.กฤษณัส</li><li>ส.สรรเสริญ</li><li>ส.อนุชิต</li><li>ส.ปิยะพงษ์</li><li>จ.อนุทิน</li></ul></div><div class="group-card">
+      <h3>กลุ่ม 2</h3>
+      <ul><li>จ.ณัฐกิตติ์</li><li>ส.มีชัย</li><li>จ.อัมฤทธิ์</li><li>ส.ปรัชญา</li><li>ส.จักรกฤษณ์</li><li>ส.วรัญญู</li><li>ส.สมเกียรติ</li></ul></div><div class="group-card">
+      <h3>กลุ่ม 3</h3>
+      <ul><li>จ.พรหมมาส</li><li>ส.เสกสรร</li><li>ส.สุดใจ</li><li>ส.วงกต</li><li>ส.อดิศร</li><li>ส.ณัฐเอก</li><li>ส.ชาติชาย</li><li>จ.ธีระ</li></ul></div><div class="group-card">
+      <h3>กลุ่ม 4</h3>
+      <ul><li>จ.ไพรพณา</li><li>จ.กิตติ</li><li>จ.วันเฉลิม</li><li>ส.ปิยะณัฐ</li><li>ส.อิสรพงษ์</li><li>ส.วิเชียร</li><li>จ.สมควร</li><li>จ.ทินกร</li></ul></div></div>
+
+</div>
+
+<!-- Week edit modal -->
+<div class="overlay" id="ovWeeks">
+  <div class="modal">
+    <h2>แก้ไขสัปดาห์ / ช่วงวันที่</h2>
+    <div id="weekList"></div>
+    <button class="btn-accent" id="btnAddWeek" style="margin-top:8px;">➕ เพิ่มสัปดาห์</button>
+
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">
+      <label style="margin-top:0;">🗓️ สร้างสัปดาห์อัตโนมัติ (จันทร์–ศุกร์)</label>
+      <div class="row-flex">
+        <div style="flex:1;">
+          <label style="margin:0 0 4px;font-weight:400;font-size:12px;">เริ่มสัปดาห์ที่ (วันจันทร์)</label>
+          <input type="date" id="autoWeekStart">
+        </div>
+        <div style="width:110px;">
+          <label style="margin:0 0 4px;font-weight:400;font-size:12px;">จำนวนเดือน</label>
+          <input type="number" id="autoWeekMonths" min="1" max="12" value="1">
+        </div>
+      </div>
+      <div class="row-flex" style="margin-top:10px;">
+        <button class="btn-accent btn-sm" id="btnGenAppend">➕ เพิ่มต่อท้ายอัตโนมัติ</button>
+        <button class="btn-warn btn-sm" id="btnGenReplace">🔁 แทนที่ทั้งหมดด้วยชุดนี้</button>
+      </div>
+      <div class="hint">ระบบจะไล่สร้างสัปดาห์ทำงานจันทร์–ศุกร์ต่อเนื่องข้ามเดือนอัตโนมัติ โดยข้ามเสาร์–อาทิตย์ • "เพิ่มต่อท้าย" จะเรียงต่อจากสัปดาห์ล่าสุดในตาราง</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-ghost" id="closeWeeks">ปิด</button>
+      <button class="btn-main" id="saveWeeks">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Groups management modal -->
+<div class="overlay" id="ovGroups">
+  <div class="modal" style="max-width:560px;">
+    <h2>จัดการกลุ่มเวร</h2>
+    <div id="groupEditList"></div>
+    <button class="btn-accent" id="btnAddGroup" style="margin-top:8px;">➕ เพิ่มกลุ่ม</button>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="closeGroups">ปิด</button>
+      <button class="btn-main" id="saveGroups">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Area edit modal -->
+<div class="overlay" id="ovArea">
+  <div class="modal">
+    <h2 id="areaModalTitle">แก้ไขพื้นที่</h2>
+    <label>ชื่อพื้นที่ / รายละเอียด</label>
+    <textarea id="areaNameInput"></textarea>
+    <label>รูปแบบการจัดเวร</label>
+    <div class="radio-group">
+      <label><input type="radio" name="areaType" value="rotate"> หมุนเวียนกลุ่ม 1–4</label>
+      <label><input type="radio" name="areaType" value="fixed"> ข้อความคงที่ / บุคคลประจำ</label>
+    </div>
+    <div class="hint">โหมด "หมุนเวียนกลุ่ม" ให้เลือกกลุ่มในแต่ละสัปดาห์จากตาราง หรือใช้ปุ่มหมุนเวียนอัตโนมัติ • โหมด "ข้อความคงที่" ให้พิมพ์ข้อความในตารางแต่ละช่องเอง</div>
+    <div class="modal-actions" style="justify-content:space-between;">
+      <button class="btn-danger" id="deleteAreaBtn">🗑️ ลบพื้นที่นี้</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-ghost" id="closeArea">ยกเลิก</button>
+        <button class="btn-main" id="saveArea">บันทึก</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cell edit modal (rotate) -->
+<div class="overlay" id="ovCellRotate">
+  <div class="modal" style="max-width:380px;">
+    <h2 id="cellRotateTitle">เลือกกลุ่มเวร</h2>
+    <select id="cellRotateSelect"></select>
+    <label style="margin-top:16px;">หมุนเวียนอัตโนมัติทั้งแถวจากสัปดาห์นี้</label>
+    <div class="row-flex">
+      <select id="autoDirection">
+        <option value="down">1 → 2 → 3 → 4 (วนขึ้น)</option>
+        <option value="up">4 → 3 → 2 → 1 (วนลง)</option>
+      </select>
+      <button class="btn-accent btn-sm" id="applyAutoRotate">ใช้เลย</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="closeCellRotate">ยกเลิก</button>
+      <button class="btn-main" id="saveCellRotate">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cell edit modal (fixed text) -->
+<div class="overlay" id="ovCellFixed">
+  <div class="modal" style="max-width:380px;">
+    <h2 id="cellFixedTitle">แก้ไขข้อความ</h2>
+    <textarea id="cellFixedInput"></textarea>
+    <label class="row-flex" style="align-items:center;">
+      <input type="checkbox" id="applyAllWeeks" style="width:auto;">
+      <span>ใช้ข้อความนี้กับทุกสัปดาห์ในแถวนี้</span>
+    </label>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="closeCellFixed">ยกเลิก</button>
+      <button class="btn-main" id="saveCellFixed">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const defaultState = {
+  lastGeneratedEnd: null,
+  banner: "ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ ตื่น เวลา 06.30 น., รวมฟังคำชี้แจงเช็คยอด เวลา 07.50 น., เวลา 08.00 เคารพธงชาติ",
+  weeks: ["1 – 5 มิ.ย. 69","8 – 12 มิ.ย. 69","15 – 19 มิ.ย. 69","22 – 26 มิ.ย. 69","29 มิ.ย. – 3 ก.ค. 69"],
+  groups: [
+    {id:1, name:"กลุ่ม 1", members:["จ.ชัยฤทธิ์","จ.คำสอน","ส.ณรงค์กร","ส.กฤษณัส","ส.สรรเสริญ","ส.อนุชิต","ส.ปิยะพงษ์","จ.อนุทิน"]},
+    {id:2, name:"กลุ่ม 2", members:["จ.ณัฐกิตติ์","ส.มีชัย","จ.อัมฤทธิ์","ส.ปรัชญา","ส.จักรกฤษณ์","ส.วรัญญู","ส.สมเกียรติ"]},
+    {id:3, name:"กลุ่ม 3", members:["จ.พรหมมาส","ส.เสกสรร","ส.สุดใจ","ส.วงกต","ส.อดิศร","ส.ณัฐเอก","ส.ชาติชาย","จ.ธีระ"]},
+    {id:4, name:"กลุ่ม 4", members:["จ.ไพรพณา","จ.กิตติ","จ.วันเฉลิม","ส.ปิยะณัฐ","ส.อิสรพงษ์","ส.วิเชียร","จ.สมควร","จ.ทินกร"]}
+  ],
+  areas: [
+    {id:1, name:"ลานจอดรถหน้าต้นโพธิ์ตลอดแนว พระพุทธ, ม้าหินอ่อน", type:"rotate", cells:[3,2,1,4,3]},
+    {id:2, name:"ห้องกาแฟ, ห้องน้ำด้านใน", type:"rotate", cells:[1,4,3,2,1]},
+    {id:3, name:"ระเบียงด้านหน้า, ห้องประชุม", type:"rotate", cells:[2,1,4,3,2]},
+    {id:4, name:"โต๊ะทานข้าวด้านหลัง พื้นที่ด้านหลังซักผ้า, ล้างจาน, ห้องอาหาร", type:"fixed",
+      cells:["ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี","ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี","ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี","ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี","ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี"]},
+    {id:5, name:"ห้องโถงหน้าห้อง ผบช./ ห้องน้ำห้องส้วม ผบช. ชั้น 1, 3", type:"fixed",
+      cells:["พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)","พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)","พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)","พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)","พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)"]},
+    {id:6, name:"ห้องทำงาน ผบ., รอง ผบ.,", type:"fixed",
+      cells:["เสมียนเวร นายทหารเวร","เสมียนเวร นายทหารเวร","เสมียนเวร นายทหารเวร","เสมียนเวร นายทหารเวร","เสมียนเวร นายทหารเวร"]}
+  ]
+};
+
+let state, nextAreaId, nextGroupId;
+
+function saveState(){ /* kept only in memory for this session */ }
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+function groupById(id){ return state.groups.find(g=>g.id===id); }
+
+/* ---------- RENDER ---------- */
+function render(){
+  document.getElementById("bannerText").value = state.banner;
+
+  // header
+  const currentIdx = getCurrentWeekIndex();
+  const headRow = document.getElementById("headRow");
+  headRow.innerHTML = '<th class="area-head">พื้นที่รับผิดชอบ</th>';
+  state.weeks.forEach((w, wi)=>{
+    const th = document.createElement("th");
+    const isCurrent = wi === currentIdx;
+    if(isCurrent) th.className = "current-week";
+    th.innerHTML = `
+      <div class="col-head">
+        <span class="week-label">${escapeHtml(w)}</span>
+        ${isCurrent ? '<span class="today-badge">📍 สัปดาห์นี้</span>' : ''}
+        <span class="col-actions">
+          <button data-act="editweek" data-idx="${wi}">✏️</button>
+          <button data-act="delweek" data-idx="${wi}">🗑️</button>
+        </span>
+      </div>`;
+    headRow.appendChild(th);
+  });
+
+  // body
+  const tbody = document.getElementById("bodyTbl");
+  tbody.innerHTML = "";
+  state.areas.forEach((area, ai)=>{
+    const tr = document.createElement("tr");
+    const tdArea = document.createElement("td");
+    tdArea.className = "area-cell";
+    tdArea.innerHTML = `
+      <div class="area-row">
+        <div>${escapeHtml(area.name).replace(/\n/g,"<br>")}
+          <div><span class="area-tag ${area.type==='fixed'?'fixed':''}">${area.type==='rotate' ? 'หมุนเวียนกลุ่ม' : 'ข้อความคงที่'}</span></div>
+        </div>
+        <div class="area-actions">
+          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="${ai}">✏️</button>
+        </div>
+      </div>`;
+    tr.appendChild(tdArea);
+
+    state.weeks.forEach((w, wi)=>{
+      const td = document.createElement("td");
+      td.className = wi === currentIdx ? "data-cell current-week-cell" : "data-cell";
+      td.dataset.areaIdx = ai;
+      td.dataset.weekIdx = wi;
+      if(area.type === "rotate"){
+        const gid = area.cells[wi];
+        const g = groupById(gid);
+        td.innerHTML = g ? `<strong>${escapeHtml(g.name)}</strong>` : `<span class="empty">ยังไม่กำหนด</span>`;
+      }else{
+        const val = area.cells[wi] || "";
+        td.innerHTML = val ? escapeHtml(val).replace(/\n/g,"<br>") : `<span class="empty">คลิกเพื่อกำหนด</span>`;
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  // groups grid
+  const grid = document.getElementById("groupsGrid");
+  grid.innerHTML = "";
+  state.groups.forEach(g=>{
+    const card = document.createElement("div");
+    card.className = "group-card";
+    card.innerHTML = `
+      <h3>${escapeHtml(g.name)}</h3>
+      <ul>${g.members.map(m=>`<li>${escapeHtml(m)}</li>`).join("")}</ul>`;
+    grid.appendChild(card);
+  });
+
+  saveState();
+}
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* ---------- AUTO WEEK (MON–FRI) GENERATION ---------- */
+const THAI_MONTHS_ABBR = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+function mondayOf(d){
+  const day = d.getDay(); // 0=Sun..6=Sat
+  const diff = (day === 0 ? -6 : 1 - day);
+  const m = new Date(d);
+  m.setDate(d.getDate() + diff);
+  m.setHours(0,0,0,0);
+  return m;
+}
+function addMonths(d, n){
+  const r = new Date(d);
+  r.setMonth(r.getMonth() + Number(n));
+  return r;
+}
+function budYear2(d){
+  return String((d.getFullYear() + 543) % 100).padStart(2, "0");
+}
+function formatWeekLabel(monday, friday){
+  if(monday.getMonth() === friday.getMonth() && monday.getFullYear() === friday.getFullYear()){
+    return `${monday.getDate()} – ${friday.getDate()} ${THAI_MONTHS_ABBR[monday.getMonth()]} ${budYear2(monday)}`;
+  }
+  return `${monday.getDate()} ${THAI_MONTHS_ABBR[monday.getMonth()]} – ${friday.getDate()} ${THAI_MONTHS_ABBR[friday.getMonth()]} ${budYear2(friday)}`;
+}
+function generateMonFriWeeks(startDateStr, months){
+  const start = mondayOf(new Date(startDateStr + "T00:00:00"));
+  const end = addMonths(start, months);
+  const weeks = [];
+  let cur = new Date(start);
+  let guard = 0;
+  while(cur < end && guard < 60){
+    const fri = new Date(cur);
+    fri.setDate(cur.getDate() + 4);
+    weeks.push({ label: formatWeekLabel(cur, fri), endDate: fri });
+    cur = new Date(cur);
+    cur.setDate(cur.getDate() + 7);
+    guard++;
+  }
+  return weeks;
+}
+function parseWeekLabelToRange(label){
+  if(!label) return null;
+  const monthIdx = {};
+  THAI_MONTHS_ABBR.forEach((m,i)=>{ monthIdx[m]=i; });
+  const cleaned = String(label).trim();
+  // Cross-month: "D MMM – D MMM YY"
+  let m = cleaned.match(/^(\d{1,2})\s*([ก-๙.]+)\s*[–-]\s*(\d{1,2})\s*([ก-๙.]+)\s*(\d{2})$/);
+  if(m){
+    const d1=Number(m[1]), mo1=monthIdx[m[2]], d2=Number(m[3]), mo2=monthIdx[m[4]], ceYear=1957+Number(m[5]);
+    if(mo1===undefined || mo2===undefined) return null;
+    const startYear = mo1>mo2 ? ceYear-1 : ceYear;
+    const start = new Date(startYear, mo1, d1, 0,0,0,0);
+    const end = new Date(ceYear, mo2, d2, 23,59,59,999);
+    return {start, end};
+  }
+  // Same month: "D – D MMM YY"
+  m = cleaned.match(/^(\d{1,2})\s*[–-]\s*(\d{1,2})\s*([ก-๙.]+)\s*(\d{2})$/);
+  if(m){
+    const d1=Number(m[1]), d2=Number(m[2]), mo=monthIdx[m[3]], ceYear=1957+Number(m[4]);
+    if(mo===undefined) return null;
+    const start = new Date(ceYear, mo, d1, 0,0,0,0);
+    const end = new Date(ceYear, mo, d2, 23,59,59,999);
+    return {start, end};
+  }
+  return null;
+}
+function getCurrentWeekIndex(){
+  const now = new Date();
+  for(let i=0;i<state.weeks.length;i++){
+    const range = parseWeekLabelToRange(state.weeks[i]);
+    if(range && now >= range.start && now <= range.end) return i;
+  }
+  return -1;
+}
+function buildCurrentMonthWeeks(now){
+  const y = now.getFullYear(), m = now.getMonth();
+  const firstDay = new Date(y, m, 1);
+  const lastDay = new Date(y, m+1, 0);
+  let cur = mondayOf(firstDay);
+  while(cur < firstDay){ cur = new Date(cur); cur.setDate(cur.getDate()+7); }
+  const weeks = []; let guard = 0;
+  while(cur <= lastDay && guard < 10){
+    const fri = new Date(cur); fri.setDate(cur.getDate()+4);
+    weeks.push(formatWeekLabel(cur, fri));
+    cur = new Date(cur); cur.setDate(cur.getDate()+7);
+    guard++;
+  }
+  return weeks;
+}
+/* Anchor point: last confirmed real-world assignment, so rotation stays
+   correct no matter which month/week is currently displayed.
+   Monday 22 Jun 2026 (22 – 26 มิ.ย. 69): area1(id1)=กลุ่ม3, area2(id2)=กลุ่ม1, area3(id3)=กลุ่ม2 */
+const ROTATION_ANCHOR_MONDAY = new Date(2026, 5, 22);
+const ROTATION_ANCHOR_GROUP = {1:3, 2:1, 3:2};
+function groupIdForWeekLabel(area, label, groupIds){
+  const anchorGroupId = ROTATION_ANCHOR_GROUP[area.id];
+  if(anchorGroupId === undefined) return null;
+  const range = parseWeekLabelToRange(label);
+  if(!range) return null;
+  const n = groupIds.length;
+  const anchorIdx = groupIds.indexOf(anchorGroupId);
+  if(anchorIdx === -1) return null;
+  const msPerWeek = 7*24*60*60*1000;
+  const weeksDiff = Math.round((range.start - ROTATION_ANCHOR_MONDAY) / msPerWeek);
+  const idx = ((anchorIdx - weeksDiff) % n + n) % n;
+  return groupIds[idx];
+}
+function resizeAreaCells(area, groupIds, targetLen){
+  if(area.type === "rotate"){
+    const n = groupIds.length;
+    let startIdx = area.cells.length ? groupIds.indexOf(area.cells[0]) : 0;
+    if(startIdx === -1) startIdx = 0;
+    let dir = -1;
+    if(area.cells.length >= 2){
+      const i0 = groupIds.indexOf(area.cells[0]), i1 = groupIds.indexOf(area.cells[1]);
+      if(i0 !== -1 && i1 !== -1){
+        const diff = ((i1 - i0) % n + n) % n;
+        dir = (diff === 1) ? 1 : -1;
+      }
+    }
+    const newCells = []; let idx = startIdx;
+    for(let k=0;k<targetLen;k++){ newCells.push(groupIds[idx]); idx = ((idx + dir) % n + n) % n; }
+    area.cells = newCells;
+  }else{
+    const val = area.cells[0] || "";
+    area.cells = new Array(targetLen).fill(val);
+  }
+}
+function initDefaultStateForCurrentMonth(){
+  defaultState.weeks = buildCurrentMonthWeeks(new Date());
+  const groupIds = defaultState.groups.map(g=>g.id);
+  defaultState.areas.forEach(a=>{
+    if(a.type === "rotate"){
+      a.cells = defaultState.weeks.map(w=>{
+        const gid = groupIdForWeekLabel(a, w, groupIds);
+        return gid !== null ? gid : groupIds[0];
+      });
+    }else{
+      resizeAreaCells(a, groupIds, defaultState.weeks.length);
+    }
+  });
+}
+function nextRotateGroupId(area){
+
+  const groupIds = state.groups.map(g=>g.id);
+  const n = groupIds.length;
+  if(n === 0) return null;
+  if(area.cells.length === 0) return groupIds[0];
+  const lastId = area.cells[area.cells.length - 1];
+  let idx = groupIds.indexOf(lastId);
+  if(idx === -1) idx = 0;
+  let dir = -1;
+  if(area.cells.length >= 2){
+    const prevIdx = groupIds.indexOf(area.cells[area.cells.length - 2]);
+    if(prevIdx !== -1){
+      const diff = ((idx - prevIdx) % n + n) % n;
+      dir = (diff === 1) ? 1 : -1;
+    }
+  }
+  const nextIdx = ((idx + dir) % n + n) % n;
+  return groupIds[nextIdx];
+}
+function defaultAutoWeekStart(){
+  if(state.lastGeneratedEnd){
+    const d = new Date(state.lastGeneratedEnd + "T00:00:00");
+    d.setDate(d.getDate() + 3); // Friday -> following Monday
+    return d.toISOString().slice(0,10);
+  }
+  return mondayOf(new Date()).toISOString().slice(0,10);
+}
+
+/* ---------- BANNER ---------- */
+document.getElementById("bannerText").addEventListener("change", e=>{
+  state.banner = e.target.value;
+  saveState();
+  toast("บันทึกข้อความหัวตารางแล้ว");
+});
+
+/* ---------- HEADER / CELL DELEGATION ---------- */
+document.getElementById("headRow").addEventListener("click", e=>{
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  const idx = Number(btn.dataset.idx);
+  if(btn.dataset.act === "delweek"){
+    if(state.weeks.length <= 1){ toast("ต้องมีอย่างน้อย 1 สัปดาห์"); return; }
+    if(confirm(`ลบสัปดาห์ "${state.weeks[idx]}" ?`)){
+      state.weeks.splice(idx,1);
+      state.areas.forEach(a=>a.cells.splice(idx,1));
+      render();
+      toast("ลบสัปดาห์แล้ว");
+    }
+  }else if(btn.dataset.act === "editweek"){
+    const val = prompt("แก้ไขช่วงวันที่:", state.weeks[idx]);
+    if(val !== null && val.trim() !== ""){
+      state.weeks[idx] = val.trim();
+      render();
+    }
+  }
+});
+
+document.getElementById("bodyTbl").addEventListener("click", e=>{
+  const editBtn = e.target.closest('button[data-act="editarea"]');
+  if(editBtn){ openAreaModal(Number(editBtn.dataset.idx)); return; }
+  const cell = e.target.closest("td.data-cell");
+  if(cell){
+    const ai = Number(cell.dataset.areaIdx), wi = Number(cell.dataset.weekIdx);
+    const area = state.areas[ai];
+    if(area.type === "rotate") openCellRotateModal(ai, wi);
+    else openCellFixedModal(ai, wi);
+  }
+});
+
+/* ---------- WEEKS MODAL ---------- */
+const ovWeeks = document.getElementById("ovWeeks");
+document.getElementById("btnEditWeeks").addEventListener("click", ()=>{
+  renderWeekList();
+  const startInput = document.getElementById("autoWeekStart");
+  if(!startInput.value) startInput.value = defaultAutoWeekStart();
+  ovWeeks.classList.add("open");
+});
+function renderWeekList(){
+  const box = document.getElementById("weekList");
+  box.innerHTML = "";
+  state.weeks.forEach((w,i)=>{
+    const row = document.createElement("div");
+    row.className = "member-line";
+    row.innerHTML = `<input type="text" data-wi="${i}" value="${escapeHtml(w)}"><button class="btn-danger btn-sm" data-del="${i}">🗑️</button>`;
+    box.appendChild(row);
+  });
+  box.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const i = Number(b.dataset.del);
+      if(state.weeks.length<=1){ toast("ต้องมีอย่างน้อย 1 สัปดาห์"); return; }
+      state.weeks.splice(i,1);
+      state.areas.forEach(a=>a.cells.splice(i,1));
+      renderWeekList();
+    });
+  });
+}
+document.getElementById("btnAddWeek").addEventListener("click", ()=>{
+  state.weeks.push("สัปดาห์ใหม่");
+  state.areas.forEach(a=>{
+    if(a.type === "rotate") a.cells.push(a.cells[a.cells.length-1] || state.groups[0]?.id || 1);
+    else a.cells.push(a.cells[a.cells.length-1] || "");
+  });
+  renderWeekList();
+});
+
+document.getElementById("btnGenAppend").addEventListener("click", ()=>{
+  const startVal = document.getElementById("autoWeekStart").value || defaultAutoWeekStart();
+  const months = Number(document.getElementById("autoWeekMonths").value) || 1;
+  const generated = generateMonFriWeeks(startVal, months);
+  if(generated.length === 0){ toast("ไม่พบสัปดาห์ในช่วงที่เลือก"); return; }
+  const groupIds = state.groups.map(g=>g.id);
+  generated.forEach(w=>{
+    state.weeks.push(w.label);
+    state.areas.forEach(a=>{
+      if(a.type === "rotate"){
+        const gid = groupIdForWeekLabel(a, w.label, groupIds);
+        a.cells.push(gid !== null ? gid : nextRotateGroupId(a));
+      }
+      else a.cells.push(a.cells[a.cells.length-1] || "");
+    });
+  });
+  state.lastGeneratedEnd = generated[generated.length-1].endDate.toISOString().slice(0,10);
+  document.getElementById("autoWeekStart").value = defaultAutoWeekStart();
+  renderWeekList();
+  toast(`เพิ่ม ${generated.length} สัปดาห์ต่อท้ายแล้ว`);
+});
+
+document.getElementById("btnGenReplace").addEventListener("click", ()=>{
+  const startVal = document.getElementById("autoWeekStart").value || defaultAutoWeekStart();
+  const months = Number(document.getElementById("autoWeekMonths").value) || 1;
+  const generated = generateMonFriWeeks(startVal, months);
+  if(generated.length === 0){ toast("ไม่พบสัปดาห์ในช่วงที่เลือก"); return; }
+  if(!confirm(`แทนที่สัปดาห์ทั้งหมดด้วย ${generated.length} สัปดาห์ใหม่? การกำหนดค่าเดิมในแต่ละช่องจะถูกล้าง`)) return;
+  state.weeks = generated.map(w=>w.label);
+  const groupIds = state.groups.map(g=>g.id);
+  state.areas.forEach(a=>{
+    if(a.type === "rotate"){
+      a.cells = generated.map(w=>{
+        const gid = groupIdForWeekLabel(a, w.label, groupIds);
+        return gid !== null ? gid : (groupIds[0] || 1);
+      });
+    }else{
+      const val = a.cells[0] || "";
+      a.cells = generated.map(()=> val);
+    }
+  });
+  state.lastGeneratedEnd = generated[generated.length-1].endDate.toISOString().slice(0,10);
+  document.getElementById("autoWeekStart").value = defaultAutoWeekStart();
+  render();
+  renderWeekList();
+  toast(`สร้างตารางใหม่ ${generated.length} สัปดาห์แล้ว`);
+});
+
+document.getElementById("closeWeeks").addEventListener("click", ()=> ovWeeks.classList.remove("open"));
+document.getElementById("saveWeeks").addEventListener("click", ()=>{
+  document.querySelectorAll('#weekList input[data-wi]').forEach(inp=>{
+    state.weeks[Number(inp.dataset.wi)] = inp.value.trim() || "สัปดาห์";
+  });
+  render();
+  ovWeeks.classList.remove("open");
+  toast("บันทึกสัปดาห์แล้ว");
+});
+
+/* ---------- GROUPS MODAL ---------- */
+const ovGroups = document.getElementById("ovGroups");
+document.getElementById("btnManageGroups").addEventListener("click", ()=>{
+  renderGroupEditList();
+  ovGroups.classList.add("open");
+});
+function renderGroupEditList(){
+  const box = document.getElementById("groupEditList");
+  box.innerHTML = "";
+  state.groups.forEach((g, gi)=>{
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;";
+    wrap.innerHTML = `
+      <label>ชื่อกลุ่ม</label>
+      <input type="text" class="grpName" data-gi="${gi}" value="${escapeHtml(g.name)}">
+      <label>รายชื่อสมาชิก (บรรทัดละ 1 คน)</label>
+      <textarea class="grpMembers" data-gi="${gi}">${escapeHtml(g.members.join("\n"))}</textarea>
+      <div class="gc-actions">
+        <button class="btn-danger btn-sm" data-delgrp="${gi}">🗑️ ลบกลุ่มนี้</button>
+      </div>`;
+    box.appendChild(wrap);
+  });
+  box.querySelectorAll('[data-delgrp]').forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const gi = Number(b.dataset.delgrp);
+      if(state.groups.length<=1){ toast("ต้องมีอย่างน้อย 1 กลุ่ม"); return; }
+      if(confirm(`ลบ "${state.groups[gi].name}" ? (ช่องในตารางที่ใช้กลุ่มนี้จะว่างลง)`)){
+        const removedId = state.groups[gi].id;
+        state.groups.splice(gi,1);
+        state.areas.forEach(a=>{
+          if(a.type==="rotate") a.cells = a.cells.map(c=> c===removedId ? null : c);
+        });
+        renderGroupEditList();
+      }
+    });
+  });
+}
+document.getElementById("btnAddGroup").addEventListener("click", ()=>{
+  state.groups.push({id: nextGroupId++, name:`กลุ่ม ${state.groups.length+1}`, members:[]});
+  renderGroupEditList();
+});
+document.getElementById("closeGroups").addEventListener("click", ()=> ovGroups.classList.remove("open"));
+document.getElementById("saveGroups").addEventListener("click", ()=>{
+  document.querySelectorAll('.grpName').forEach(inp=>{
+    state.groups[Number(inp.dataset.gi)].name = inp.value.trim() || "กลุ่ม";
+  });
+  document.querySelectorAll('.grpMembers').forEach(ta=>{
+    state.groups[Number(ta.dataset.gi)].members = ta.value.split("\n").map(s=>s.trim()).filter(Boolean);
+  });
+  render();
+  ovGroups.classList.remove("open");
+  toast("บันทึกกลุ่มเวรแล้ว");
+});
+
+/* ---------- AREA MODAL ---------- */
+const ovArea = document.getElementById("ovArea");
+let editingAreaIdx = null;
+document.getElementById("btnAddArea").addEventListener("click", ()=>{
+  const newArea = {
+    id: nextAreaId++,
+    name: "พื้นที่ใหม่",
+    type: "rotate",
+    cells: state.weeks.map(()=> state.groups[0]?.id || 1)
+  };
+  state.areas.push(newArea);
+  render();
+  openAreaModal(state.areas.length-1);
+});
+function openAreaModal(idx){
+  editingAreaIdx = idx;
+  const area = state.areas[idx];
+  document.getElementById("areaModalTitle").textContent = "แก้ไขพื้นที่";
+  document.getElementById("areaNameInput").value = area.name;
+  document.querySelectorAll('input[name="areaType"]').forEach(r=> r.checked = (r.value === area.type));
+  ovArea.classList.add("open");
+}
+document.getElementById("closeArea").addEventListener("click", ()=> ovArea.classList.remove("open"));
+document.getElementById("saveArea").addEventListener("click", ()=>{
+  const area = state.areas[editingAreaIdx];
+  area.name = document.getElementById("areaNameInput").value.trim() || "พื้นที่";
+  const newType = document.querySelector('input[name="areaType"]:checked').value;
+  if(newType !== area.type){
+    area.type = newType;
+    if(newType === "rotate"){
+      area.cells = state.weeks.map(()=> state.groups[0]?.id || 1);
+    }else{
+      area.cells = state.weeks.map(()=> "");
+    }
+  }
+  render();
+  ovArea.classList.remove("open");
+  toast("บันทึกพื้นที่แล้ว");
+});
+document.getElementById("deleteAreaBtn").addEventListener("click", ()=>{
+  const area = state.areas[editingAreaIdx];
+  if(confirm(`ลบพื้นที่ "${area.name}" ?`)){
+    state.areas.splice(editingAreaIdx,1);
+    render();
+    ovArea.classList.remove("open");
+    toast("ลบพื้นที่แล้ว");
+  }
+});
+
+/* ---------- CELL: ROTATE MODAL ---------- */
+const ovCellRotate = document.getElementById("ovCellRotate");
+let cellCtx = {ai:null, wi:null};
+function openCellRotateModal(ai, wi){
+  cellCtx = {ai, wi};
+  const area = state.areas[ai];
+  document.getElementById("cellRotateTitle").textContent = `${area.name} — ${state.weeks[wi]}`;
+  const sel = document.getElementById("cellRotateSelect");
+  sel.innerHTML = state.groups.map(g=>`<option value="${g.id}">${escapeHtml(g.name)}</option>`).join("");
+  sel.value = area.cells[wi] || (state.groups[0] ? state.groups[0].id : "");
+  ovCellRotate.classList.add("open");
+}
+document.getElementById("closeCellRotate").addEventListener("click", ()=> ovCellRotate.classList.remove("open"));
+document.getElementById("saveCellRotate").addEventListener("click", ()=>{
+  const area = state.areas[cellCtx.ai];
+  area.cells[cellCtx.wi] = Number(document.getElementById("cellRotateSelect").value);
+  render();
+  ovCellRotate.classList.remove("open");
+});
+document.getElementById("applyAutoRotate").addEventListener("click", ()=>{
+  const area = state.areas[cellCtx.ai];
+  const dir = document.getElementById("autoDirection").value;
+  const groupIds = state.groups.map(g=>g.id);
+  const n = groupIds.length;
+  let startIdx = groupIds.indexOf(Number(document.getElementById("cellRotateSelect").value));
+  if(startIdx === -1) startIdx = 0;
+  for(let k = cellCtx.wi; k < area.cells.length; k++){
+    const step = k - cellCtx.wi;
+    const offset = dir === "down" ? step : -step;
+    let gi = ((startIdx + offset) % n + n) % n;
+    area.cells[k] = groupIds[gi];
+  }
+  render();
+  ovCellRotate.classList.remove("open");
+  toast("หมุนเวียนกลุ่มอัตโนมัติแล้ว");
+});
+
+/* ---------- CELL: FIXED TEXT MODAL ---------- */
+const ovCellFixed = document.getElementById("ovCellFixed");
+function openCellFixedModal(ai, wi){
+  cellCtx = {ai, wi};
+  const area = state.areas[ai];
+  document.getElementById("cellFixedTitle").textContent = `${area.name} — ${state.weeks[wi]}`;
+  document.getElementById("cellFixedInput").value = area.cells[wi] || "";
+  document.getElementById("applyAllWeeks").checked = false;
+  ovCellFixed.classList.add("open");
+}
+document.getElementById("closeCellFixed").addEventListener("click", ()=> ovCellFixed.classList.remove("open"));
+document.getElementById("saveCellFixed").addEventListener("click", ()=>{
+  const area = state.areas[cellCtx.ai];
+  const val = document.getElementById("cellFixedInput").value;
+  if(document.getElementById("applyAllWeeks").checked){
+    area.cells = area.cells.map(()=> val);
+  }else{
+    area.cells[cellCtx.wi] = val;
+  }
+  render();
+  ovCellFixed.classList.remove("open");
+});
+
+function loadHtml2Canvas(){
+  return new Promise((resolve, reject)=>{
+    if(window.html2canvas){ resolve(); return; }
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+    s.onload = ()=> resolve();
+    s.onerror = ()=> reject(new Error("โหลดตัวช่วยไม่สำเร็จ"));
+    document.head.appendChild(s);
+  });
+}
+
+/* ---------- SAVE AS IMAGE ---------- */
+document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
+  const toolbar = document.querySelector(".toolbar");
+  const target = document.querySelector(".wrap");
+  toast("กำลังเตรียมตัวช่วยบันทึกรูปภาพ...");
+  try{
+    await loadHtml2Canvas();
+  }catch(err){
+    toast("โหลดตัวช่วยบันทึกรูปภาพไม่สำเร็จ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+    return;
+  }
+  toolbar.classList.add("hide-for-capture");
+  toast("กำลังสร้างรูปภาพ...");
+  try{
+    // small delay so the toolbar hide reflows before capture
+    await new Promise(r=>setTimeout(r, 50));
+    const canvas = await html2canvas(target, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
+    const dateStr = new Date().toISOString().slice(0,10);
+    const filename = `ตารางเวรทำความสะอาด-${dateStr}.png`;
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    if(!blob){ toast("สร้างรูปภาพไม่สำเร็จ"); return; }
+
+    const file = new File([blob], filename, {type:"image/png"});
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    // Mobile / any device that supports native share-with-files: opens the
+    // "Save Image" / "Save to Photos" sheet directly.
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({files:[file], title: filename});
+        toast("บันทึก/แชร์รูปภาพแล้ว");
+      }catch(err){
+        if(err && err.name !== "AbortError"){
+          toast("ไม่สามารถแชร์รูปภาพได้");
+        }
+      }
+    }else if(isMobile){
+      // Mobile without file-share support: open the image so the user can
+      // long-press → "Save Image" / "บันทึกรูปภาพ" to the camera roll.
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      toast("เปิดรูปภาพแล้ว กดค้างที่รูปเพื่อบันทึกลงมือถือ");
+      setTimeout(()=> URL.revokeObjectURL(url), 60000);
+    }else{
+      // Desktop: normal file download.
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      toast("บันทึกรูปภาพแล้ว");
+      setTimeout(()=> URL.revokeObjectURL(url), 10000);
+    }
+  }catch(err){
+    console.error(err);
+    toast("เกิดข้อผิดพลาดในการบันทึกรูปภาพ");
+  }finally{
+    toolbar.classList.remove("hide-for-capture");
+  }
+});
+/* close modals on backdrop click */
+document.querySelectorAll(".overlay").forEach(ov=>{
+  ov.addEventListener("click", e=>{ if(e.target === ov) ov.classList.remove("open"); });
+});
+
+initDefaultStateForCurrentMonth();
+state = JSON.parse(JSON.stringify(defaultState));
+nextAreaId = Math.max(...state.areas.map(a=>a.id), 0) + 1;
+nextGroupId = Math.max(...state.groups.map(g=>g.id), 0) + 1;
+render();
+</script>
+</body>
+</html>
