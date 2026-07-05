@@ -1207,7 +1207,6 @@ function loadHtml2Canvas(){
 
 /* ---------- SAVE AS IMAGE ---------- */
 document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
-  const toolbar = document.querySelector(".toolbar");
   const target = document.querySelector(".wrap");
   toast("กำลังเตรียมตัวช่วยบันทึกรูปภาพ...");
   try{
@@ -1216,23 +1215,29 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     toast("โหลดตัวช่วยบันทึกรูปภาพไม่สำเร็จ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
     return;
   }
-  toolbar.classList.add("hide-for-capture");
   toast("กำลังสร้างรูปภาพ...");
 
-  // Temporarily resize the target and any horizontally-scrollable containers
-  // (e.g. the table wrapper) to their full natural content width. This makes
-  // sure the whole table (every column, not just what's scrolled into view)
-  // is captured, while keeping everything properly sized/centered instead of
-  // being left-aligned inside an oversized canvas.
-  const wideEls = [target, ...target.querySelectorAll(".table-card")];
-  const restoreWide = wideEls.map(el=>({
-    el,
-    width: el.style.width,
-    maxWidth: el.style.maxWidth,
-    overflow: el.style.overflow,
-    overflowX: el.style.overflowX,
-    scrollLeft: el.scrollLeft
-  }));
+  // Build the capture entirely off-screen on a clone of the content. This
+  // way we can hide the toolbar and widen the table to its full natural
+  // width for a complete capture WITHOUT ever touching the live page, so
+  // the on-screen form stays perfectly still — nothing hides or resizes.
+  const clone = target.cloneNode(true);
+  const offscreen = document.createElement("div");
+  offscreen.style.position = "fixed";
+  offscreen.style.top = "0";
+  offscreen.style.left = "-99999px";
+  offscreen.style.zIndex = "-1";
+  offscreen.style.pointerEvents = "none";
+  offscreen.appendChild(clone);
+  document.body.appendChild(offscreen);
+
+  const cloneToolbar = clone.querySelector(".toolbar");
+  if(cloneToolbar) cloneToolbar.remove();
+
+  // Expand the clone (and any horizontally-scrollable containers inside it,
+  // e.g. the table wrapper) to full natural content width so the whole
+  // table—every column—is captured instead of just what fits on screen.
+  const wideEls = [clone, ...clone.querySelectorAll(".table-card")];
   wideEls.forEach(el=>{
     el.scrollLeft = 0;
     el.style.maxWidth = "none";
@@ -1242,9 +1247,9 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
   });
 
   try{
-    // small delay so the toolbar hide + width changes reflow before capture
+    // small delay so the clone reflows before capture
     await new Promise(r=>setTimeout(r, 50));
-    const canvas = await html2canvas(target, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
+    const canvas = await html2canvas(clone, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
     const dateStr = new Date().toISOString().slice(0,10);
     const filename = `ตารางเวรทำความสะอาด-${dateStr}.png`;
 
@@ -1275,14 +1280,7 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     console.error(err);
     toast("เกิดข้อผิดพลาดในการบันทึกรูปภาพ");
   }finally{
-    toolbar.classList.remove("hide-for-capture");
-    restoreWide.forEach(({el, width, maxWidth, overflow, overflowX, scrollLeft})=>{
-      el.style.width = width;
-      el.style.maxWidth = maxWidth;
-      el.style.overflow = overflow;
-      el.style.overflowX = overflowX;
-      el.scrollLeft = scrollLeft;
-    });
+    offscreen.remove();
   }
 });
 /* close modals on backdrop click */
