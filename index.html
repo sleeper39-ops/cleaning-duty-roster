@@ -1101,10 +1101,39 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
   }
   toolbar.classList.add("hide-for-capture");
   toast("กำลังสร้างรูปภาพ...");
+
+  // Find any horizontally-scrollable containers inside the target (e.g. the
+  // table wrapper) and temporarily expand them so the capture includes the
+  // FULL width (all columns), not just whatever was scrolled into view.
+  const scrollables = Array.from(target.querySelectorAll("*")).filter(el=>{
+    const cs = getComputedStyle(el);
+    return (cs.overflowX === "auto" || cs.overflowX === "scroll") && el.scrollWidth > el.clientWidth;
+  });
+  const restoreScrollables = scrollables.map(el=>({
+    el,
+    overflow: el.style.overflow,
+    overflowX: el.style.overflowX,
+    scrollLeft: el.scrollLeft
+  }));
+  scrollables.forEach(el=>{
+    el.scrollLeft = 0;
+    el.style.overflow = "visible";
+    el.style.overflowX = "visible";
+  });
+
   try{
-    // small delay so the toolbar hide reflows before capture
+    // small delay so the toolbar hide + overflow changes reflow before capture
     await new Promise(r=>setTimeout(r, 50));
-    const canvas = await html2canvas(target, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
+    const fullWidth = Math.max(target.scrollWidth, document.documentElement.scrollWidth);
+    const canvas = await html2canvas(target, {
+      backgroundColor:"#F2FAF8",
+      scale:2,
+      useCORS:true,
+      width: fullWidth,
+      windowWidth: fullWidth,
+      scrollX: 0,
+      scrollY: 0
+    });
     const dateStr = new Date().toISOString().slice(0,10);
     const filename = `ตารางเวรทำความสะอาด-${dateStr}.png`;
 
@@ -1147,6 +1176,11 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     toast("เกิดข้อผิดพลาดในการบันทึกรูปภาพ");
   }finally{
     toolbar.classList.remove("hide-for-capture");
+    restoreScrollables.forEach(({el, overflow, overflowX, scrollLeft})=>{
+      el.style.overflow = overflow;
+      el.style.overflowX = overflowX;
+      el.scrollLeft = scrollLeft;
+    });
   }
 });
 /* close modals on backdrop click */
