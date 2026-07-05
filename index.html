@@ -126,22 +126,15 @@
   }
   th .col-head{display:flex;flex-direction:column;gap:6px;align-items:center;}
   th .col-head .week-label{font-size:13.5px;}
-  th .col-head .col-actions{display:flex;gap:4px;}
-  th .col-actions button{background:rgba(255,255,255,.18);color:#fff;border-radius:5px;padding:2px 6px;font-size:11px;}
-  th .col-actions button:hover{background:rgba(255,255,255,.32);}
 
   thead th.current-week{
     background:var(--current-border);
     color:var(--current-ink);
   }
-  thead th.current-week .col-actions button{background:rgba(0,0,0,.12);color:var(--current-ink);}
-  thead th.current-week .col-actions button:hover{background:rgba(0,0,0,.2);}
   thead th.upcoming-week{
     background:var(--upcoming-border);
     color:#fff;
   }
-  thead th.upcoming-week .col-actions button{background:rgba(255,255,255,.22);color:#fff;}
-  thead th.upcoming-week .col-actions button:hover{background:rgba(255,255,255,.36);}
   .today-badge{
     display:inline-block;
     font-size:10.5px;
@@ -296,52 +289,24 @@
           <th class="area-head">พื้นที่รับผิดชอบ</th><th>
       <div class="col-head">
         <span class="week-label">18 – 22 พ.ค. 69</span>
-        <span class="col-actions">
-          <button data-act="editweek" data-idx="0">✏️</button>
-          <button data-act="delweek" data-idx="0">🗑️</button>
-        </span>
       </div></th><th>
       <div class="col-head">
         <span class="week-label">25 – 29 พ.ค. 69</span>
-        <span class="col-actions">
-          <button data-act="editweek" data-idx="1">✏️</button>
-          <button data-act="delweek" data-idx="1">🗑️</button>
-        </span>
       </div></th><th>
       <div class="col-head">
         <span class="week-label">1 – 5 มิ.ย. 69</span>
-        <span class="col-actions">
-          <button data-act="editweek" data-idx="2">✏️</button>
-          <button data-act="delweek" data-idx="2">🗑️</button>
-        </span>
       </div></th><th>
       <div class="col-head">
         <span class="week-label">8 – 12 มิ.ย. 69</span>
-        <span class="col-actions">
-          <button data-act="editweek" data-idx="3">✏️</button>
-          <button data-act="delweek" data-idx="3">🗑️</button>
-        </span>
       </div></th><th>
       <div class="col-head">
         <span class="week-label">15 – 19 มิ.ย. 69</span>
-        <span class="col-actions">
-          <button data-act="editweek" data-idx="4">✏️</button>
-          <button data-act="delweek" data-idx="4">🗑️</button>
-        </span>
       </div></th><th>
       <div class="col-head">
         <span class="week-label">22 – 26 มิ.ย. 69</span>
-        <span class="col-actions">
-          <button data-act="editweek" data-idx="5">✏️</button>
-          <button data-act="delweek" data-idx="5">🗑️</button>
-        </span>
       </div></th><th>
       <div class="col-head">
         <span class="week-label">29 มิ.ย. – 3 ก.ค. 69</span>
-        <span class="col-actions">
-          <button data-act="editweek" data-idx="6">✏️</button>
-          <button data-act="delweek" data-idx="6">🗑️</button>
-        </span>
       </div></th>
         </tr>
       </thead>
@@ -572,10 +537,6 @@ function render(){
         <span class="week-label">${escapeHtml(w)}</span>
         ${isCurrent ? '<span class="today-badge">📍 สัปดาห์นี้</span>' : ''}
         ${isUpcoming ? '<span class="upcoming-badge">🔜 ใกล้ถึง</span>' : ''}
-        <span class="col-actions">
-          <button data-act="editweek" data-idx="${wi}">✏️</button>
-          <button data-act="delweek" data-idx="${wi}">🗑️</button>
-        </span>
       </div>`;
     headRow.appendChild(th);
   });
@@ -831,26 +792,6 @@ document.getElementById("bannerText").addEventListener("change", e=>{
 });
 
 /* ---------- HEADER / CELL DELEGATION ---------- */
-document.getElementById("headRow").addEventListener("click", e=>{
-  const btn = e.target.closest("button");
-  if(!btn) return;
-  const idx = Number(btn.dataset.idx);
-  if(btn.dataset.act === "delweek"){
-    if(state.weeks.length <= 1){ toast("ต้องมีอย่างน้อย 1 สัปดาห์"); return; }
-    if(confirm(`ลบสัปดาห์ "${state.weeks[idx]}" ?`)){
-      state.weeks.splice(idx,1);
-      state.areas.forEach(a=>a.cells.splice(idx,1));
-      render();
-      toast("ลบสัปดาห์แล้ว");
-    }
-  }else if(btn.dataset.act === "editweek"){
-    const val = prompt("แก้ไขช่วงวันที่:", state.weeks[idx]);
-    if(val !== null && val.trim() !== ""){
-      state.weeks[idx] = val.trim();
-      render();
-    }
-  }
-});
 
 document.getElementById("bodyTbl").addEventListener("click", e=>{
   const editBtn = e.target.closest('button[data-act="editarea"]');
