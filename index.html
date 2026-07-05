@@ -1207,8 +1207,8 @@ function loadHtml2Canvas(){
 
 /* ---------- SAVE AS IMAGE ---------- */
 document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
-  const toolbar = document.querySelector(".toolbar");
   const target = document.querySelector(".wrap");
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   toast("กำลังเตรียมตัวช่วยบันทึกรูปภาพ...");
   try{
     await loadHtml2Canvas();
@@ -1216,64 +1216,113 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     toast("โหลดตัวช่วยบันทึกรูปภาพไม่สำเร็จ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
     return;
   }
-  toolbar.classList.add("hide-for-capture");
   toast("กำลังสร้างรูปภาพ...");
 
-  // Temporarily resize the target and any horizontally-scrollable containers
-  // (e.g. the table wrapper) to their full natural content width. This makes
-  // sure the whole table (every column, not just what's scrolled into view)
-  // is captured, while keeping everything properly sized/centered instead of
-  // being left-aligned inside an oversized canvas.
-  const wideEls = [target, ...target.querySelectorAll(".table-card")];
-  const restoreWide = wideEls.map(el=>({
-    el,
-    width: el.style.width,
-    maxWidth: el.style.maxWidth,
-    overflow: el.style.overflow,
-    overflowX: el.style.overflowX,
-    scrollLeft: el.scrollLeft
-  }));
-  wideEls.forEach(el=>{
-    el.scrollLeft = 0;
-    el.style.maxWidth = "none";
-    el.style.width = "max-content";
-    el.style.overflow = "visible";
-    el.style.overflowX = "visible";
-  });
+  if(isMobile){
+    // ----- MOBILE: original flow, unchanged -----
+    const toolbar = document.querySelector(".toolbar");
+    toolbar.classList.add("hide-for-capture");
 
-  try{
-    // small delay so the toolbar hide + width changes reflow before capture
-    await new Promise(r=>setTimeout(r, 50));
-    const canvas = await html2canvas(target, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
-    const dateStr = new Date().toISOString().slice(0,10);
-    const filename = `ตารางเวรทำความสะอาด-${dateStr}.png`;
+    // Temporarily resize the target and any horizontally-scrollable containers
+    // (e.g. the table wrapper) to their full natural content width. This makes
+    // sure the whole table (every column, not just what's scrolled into view)
+    // is captured, while keeping everything properly sized/centered instead of
+    // being left-aligned inside an oversized canvas.
+    const wideEls = [target, ...target.querySelectorAll(".table-card")];
+    const restoreWide = wideEls.map(el=>({
+      el,
+      width: el.style.width,
+      maxWidth: el.style.maxWidth,
+      overflow: el.style.overflow,
+      overflowX: el.style.overflowX,
+      scrollLeft: el.scrollLeft
+    }));
+    wideEls.forEach(el=>{
+      el.scrollLeft = 0;
+      el.style.maxWidth = "none";
+      el.style.width = "max-content";
+      el.style.overflow = "visible";
+      el.style.overflowX = "visible";
+    });
 
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-    if(!blob){ toast("สร้างรูปภาพไม่สำเร็จ"); return; }
+    try{
+      // small delay so the toolbar hide + width changes reflow before capture
+      await new Promise(r=>setTimeout(r, 50));
+      const canvas = await html2canvas(target, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
+      const dateStr = new Date().toISOString().slice(0,10);
+      const filename = `ตารางเวรทำความสะอาด-${dateStr}.png`;
 
-    const file = new File([blob], filename, {type:"image/png"});
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+      if(!blob){ toast("สร้างรูปภาพไม่สำเร็จ"); return; }
 
-    // Mobile / any device that supports native share-with-files: opens the
-    // "Save Image" / "Save to Photos" sheet directly.
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      try{
-        await navigator.share({files:[file], title: filename});
-        toast("บันทึก/แชร์รูปภาพแล้ว");
-      }catch(err){
-        if(err && err.name !== "AbortError"){
-          toast("ไม่สามารถแชร์รูปภาพได้");
+      const file = new File([blob], filename, {type:"image/png"});
+
+      // Mobile / any device that supports native share-with-files: opens the
+      // "Save Image" / "Save to Photos" sheet directly.
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        try{
+          await navigator.share({files:[file], title: filename});
+          toast("บันทึก/แชร์รูปภาพแล้ว");
+        }catch(err){
+          if(err && err.name !== "AbortError"){
+            toast("ไม่สามารถแชร์รูปภาพได้");
+          }
         }
+      }else{
+        // Mobile without file-share support: open the image so the user can
+        // long-press → "Save Image" / "บันทึกรูปภาพ" to the camera roll.
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+        toast("เปิดรูปภาพแล้ว กดค้างที่รูปเพื่อบันทึกลงมือถือ");
+        setTimeout(()=> URL.revokeObjectURL(url), 60000);
       }
-    }else if(isMobile){
-      // Mobile without file-share support: open the image so the user can
-      // long-press → "Save Image" / "บันทึกรูปภาพ" to the camera roll.
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      toast("เปิดรูปภาพแล้ว กดค้างที่รูปเพื่อบันทึกลงมือถือ");
-      setTimeout(()=> URL.revokeObjectURL(url), 60000);
-    }else{
-      // Desktop: normal file download.
+    }catch(err){
+      console.error(err);
+      toast("เกิดข้อผิดพลาดในการบันทึกรูปภาพ");
+    }finally{
+      toolbar.classList.remove("hide-for-capture");
+      restoreWide.forEach(({el, width, maxWidth, overflow, overflowX, scrollLeft})=>{
+        el.style.width = width;
+        el.style.maxWidth = maxWidth;
+        el.style.overflow = overflow;
+        el.style.overflowX = overflowX;
+        el.scrollLeft = scrollLeft;
+      });
+    }
+  }else{
+    // ----- DESKTOP: latest flow — capture off-screen so the live page never
+    // hides or resizes, then download the file straight to disk. -----
+    const clone = target.cloneNode(true);
+    const offscreen = document.createElement("div");
+    offscreen.style.position = "fixed";
+    offscreen.style.top = "0";
+    offscreen.style.left = "-99999px";
+    offscreen.style.zIndex = "-1";
+    offscreen.style.pointerEvents = "none";
+    offscreen.appendChild(clone);
+    document.body.appendChild(offscreen);
+
+    const cloneToolbar = clone.querySelector(".toolbar");
+    if(cloneToolbar) cloneToolbar.remove();
+
+    const wideEls = [clone, ...clone.querySelectorAll(".table-card")];
+    wideEls.forEach(el=>{
+      el.scrollLeft = 0;
+      el.style.maxWidth = "none";
+      el.style.width = "max-content";
+      el.style.overflow = "visible";
+      el.style.overflowX = "visible";
+    });
+
+    try{
+      await new Promise(r=>setTimeout(r, 50));
+      const canvas = await html2canvas(clone, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
+      const dateStr = new Date().toISOString().slice(0,10);
+      const filename = `ตารางเวรทำความสะอาด-${dateStr}.png`;
+
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+      if(!blob){ toast("สร้างรูปภาพไม่สำเร็จ"); return; }
+
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -1281,19 +1330,12 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
       link.click();
       toast("บันทึกรูปภาพแล้ว");
       setTimeout(()=> URL.revokeObjectURL(url), 10000);
+    }catch(err){
+      console.error(err);
+      toast("เกิดข้อผิดพลาดในการบันทึกรูปภาพ");
+    }finally{
+      offscreen.remove();
     }
-  }catch(err){
-    console.error(err);
-    toast("เกิดข้อผิดพลาดในการบันทึกรูปภาพ");
-  }finally{
-    toolbar.classList.remove("hide-for-capture");
-    restoreWide.forEach(({el, width, maxWidth, overflow, overflowX, scrollLeft})=>{
-      el.style.width = width;
-      el.style.maxWidth = maxWidth;
-      el.style.overflow = overflow;
-      el.style.overflowX = overflowX;
-      el.scrollLeft = scrollLeft;
-    });
   }
 });
 /* close modals on backdrop click */
