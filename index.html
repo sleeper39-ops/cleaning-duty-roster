@@ -62,6 +62,14 @@
     align-items:center;
   }
   .toolbar .spacer{flex:1;}
+  .db-status{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:20px;
+    white-space:nowrap;
+  }
+  .db-status-checking{background:#EEE;color:#666;}
+  .db-status-ok{background:#DCF5E3;color:#1E7A3E;}
+  .db-status-fail{background:#FBDADA;color:#A32626;cursor:pointer;}
   button{
     font-family:inherit;
     cursor:pointer;
@@ -301,6 +309,7 @@
     <button class="btn-main" id="btnEditWeeks">🗓️ แก้ไขสัปดาห์</button>
     <button class="btn-main" id="btnManageGroups">👥 จัดการกลุ่มเวร</button>
     <button class="btn-accent" id="btnAddArea">➕ เพิ่มพื้นที่</button>
+    <span id="dbStatus" class="db-status db-status-checking" title="สถานะการเชื่อมต่อฐานข้อมูล">🔄 กำลังตรวจสอบฐานข้อมูล...</span>
     <div class="spacer"></div>
     <button class="btn-info" id="btnSaveImage">🖼️ บันทึกรูปภาพ</button>
   </div>
@@ -540,24 +549,62 @@ let state, nextAreaId, nextGroupId;
 // This avoids failures when that CDN is blocked/unreachable on restrictive
 // networks (a common issue on office/military networks) — only your own
 // Firebase database domain below needs to be reachable.
-const FIREBASE_DB_URL = "https://daily-duty-report-default-rtdb.asia-southeast1.firebasedatabase.app";
+const FIREBASE_DB_URL = "https://cleaning-duty-roster-6ba83-default-rtdb.asia-southeast1.firebasedatabase.app";
 // Change this if you ever need multiple independent boards in the same Firebase project.
 const STATE_PATH = "cleaningDutyRoster/state";
 const STATE_URL = `${FIREBASE_DB_URL}/${STATE_PATH}.json`;
 
 let firebaseReady = true; // optimistic; flips to false only if a request actually fails
 
+function setDbStatus(mode, detail){
+  const el = document.getElementById("dbStatus");
+  if(!el) return;
+  el.classList.remove("db-status-checking","db-status-ok","db-status-fail");
+  if(mode === "checking"){
+    el.classList.add("db-status-checking");
+    el.textContent = "🔄 กำลังตรวจสอบฐานข้อมูล...";
+    el.title = "กำลังเชื่อมต่อฐานข้อมูล";
+  }else if(mode === "ok"){
+    el.classList.add("db-status-ok");
+    el.textContent = "🟢 เชื่อมต่อฐานข้อมูลแล้ว บันทึกอัตโนมัติ";
+    el.title = "การแก้ไขทุกครั้งจะถูกบันทึกลงฐานข้อมูลอัตโนมัติ";
+  }else{
+    el.classList.add("db-status-fail");
+    el.textContent = "🔴 ไม่ได้เชื่อมต่อฐานข้อมูล (แตะเพื่อลองใหม่)";
+    el.title = detail || "การแก้ไขจะไม่ถูกบันทึกถาวรจนกว่าจะเชื่อมต่อสำเร็จ";
+  }
+}
+async function checkDbConnection(){
+  setDbStatus("checking");
+  const data = await fetchSavedState();
+  return data;
+}
+async function classifyFetchError(res){
+  if(res && (res.status === 401 || res.status === 403)){
+    return "เชื่อมต่อฐานข้อมูลไม่สำเร็จ: ไม่มีสิทธิ์เข้าถึง (ตรวจสอบ Firebase Realtime Database Rules ว่าอนุญาต read/write หรือยัง)";
+  }
+  if(res){
+    return `เชื่อมต่อฐานข้อมูลไม่สำเร็จ: เซิร์ฟเวอร์ตอบกลับรหัส ${res.status}`;
+  }
+  return "เชื่อมต่อฐานข้อมูลไม่สำเร็จ (ตรวจสอบอินเทอร์เน็ต หรือโดเมน Firebase อาจถูกบล็อก)";
+}
 async function fetchSavedState(){
   try{
     const res = await fetch(STATE_URL, {method:"GET"});
-    if(!res.ok) throw new Error("HTTP " + res.status);
+    if(!res.ok){
+      const msg = await classifyFetchError(res);
+      throw new Error(msg);
+    }
     const data = await res.json();
     firebaseReady = true;
+    setDbStatus("ok");
     return data; // null if nothing saved yet
   }catch(err){
     console.error(err);
     firebaseReady = false;
-    toast("เชื่อมต่อฐานข้อมูลไม่สำเร็จ (ตรวจสอบอินเทอร์เน็ต) การแก้ไขจะไม่ถูกบันทึกถาวรในตอนนี้");
+    const msg = (err && err.message && err.message.startsWith("เชื่อมต่อฐานข้อมูล")) ? err.message : await classifyFetchError(null);
+    setDbStatus("fail", msg);
+    toast(msg);
     return null;
   }
 }
@@ -569,15 +616,25 @@ function saveState(){
       method:"PUT",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify(state)
-    }).then(res=>{
-      if(!res.ok) throw new Error("HTTP " + res.status);
+    }).then(async res=>{
+      if(!res.ok){
+        const msg = await classifyFetchError(res);
+        throw new Error(msg);
+      }
       firebaseReady = true;
+      setDbStatus("ok");
     }).catch(err=>{
       console.error(err);
-      toast("บันทึกข้อมูลไปยังฐานข้อมูลไม่สำเร็จ");
+      firebaseReady = false;
+      const msg = (err && err.message) || "บันทึกข้อมูลไปยังฐานข้อมูลไม่สำเร็จ";
+      setDbStatus("fail", msg);
+      toast(msg);
     });
   }, 400);
 }
+document.getElementById("dbStatus").addEventListener("click", ()=>{
+  if(!firebaseReady) checkDbConnection();
+});
 function arraysEqual(a, b){
   if(!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
   return a.every((v,i)=> v === b[i]);
