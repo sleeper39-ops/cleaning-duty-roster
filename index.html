@@ -191,6 +191,7 @@
   }
   td.data-cell:hover{background:#EAFAF7;}
   td.data-cell .empty{color:#aaa;font-style:italic;font-weight:400;}
+  td.data-cell .rest-tag{color:#6B8CAE;font-style:italic;font-weight:600;}
 
   .add-row-btn-cell{text-align:center;padding:14px;}
 
@@ -487,9 +488,9 @@ const defaultState = {
   banner: "ตารางเวรทำความสะอาดพื้นที่รับผิดชอบ เวลา 06.30 น.",
   weeks: ["1 – 5 มิ.ย. 69","8 – 12 มิ.ย. 69","15 – 19 มิ.ย. 69","22 – 26 มิ.ย. 69","29 มิ.ย. – 3 ก.ค. 69"],
   groups: [
-    {id:1, name:"กลุ่ม 1", members:["จ.ชัยฤทธิ์","จ.คำสอน","ส.ณรงค์กร","ส.กฤษณัส","ส.สรรเสริญ","ส.อนุชิต","ส.ปิยะพงษ์","จ.อนุทิน"]},
-    {id:2, name:"กลุ่ม 2", members:["จ.ณัฐกิตติ์","ส.มีชัย","จ.อัมฤทธิ์","ส.ปรัชญา","ส.จักรกฤษณ์","ส.วรัญญู","ส.สมเกียรติ"]},
-    {id:3, name:"กลุ่ม 3", members:["จ.พรหมมาส","ส.เสกสรร","ส.สุดใจ","ส.วงกต","ส.อดิศร","ส.ณัฐเอก","ส.ชาติชาย","จ.ธีระ"]},
+    {id:1, name:"กลุ่ม 1", members:["จ.ชัยฤทธิ์","จ.คำสอน","ส.ณรงค์กร","ส.กฤษณัส","ส.สรรเสริญ","ส.ปิยะพงษ์","จ.อนุทิน"]},
+    {id:2, name:"กลุ่ม 2", members:["จ.ณัฐกิตติ์","จ.อัมฤทธิ์","ส.ปรัชญา","ส.จักรกฤษณ์","ส.วรัญญู","ส.สมเกียรติ"]},
+    {id:3, name:"กลุ่ม 3", members:["จ.พรหมมาส","ส.เสกสรร","จ.สุดใจ","ส.วงกต","จ.อดิศร","ส.ณัฐเอก","ส.ชาติชาย","จ.ธีระ"]},
     {id:4, name:"กลุ่ม 4", members:["จ.ไพรพณา","จ.กิตติ","จ.วันเฉลิม","ส.ปิยะณัฐ","ส.อิสรพงษ์","ส.วิเชียร","จ.สมควร","จ.ทินกร"]}
   ],
   areas: [
@@ -499,9 +500,9 @@ const defaultState = {
     {id:4, name:"โต๊ะทานข้าวด้านหลัง พื้นที่ด้านหลังซักผ้า, ล้างจาน, ห้องอาหาร", type:"fixed",
       cells:["ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี","ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี","ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี","ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี","ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี"]},
     {id:5, name:"ห้องโถงหน้าห้อง ผบช./ ห้องน้ำห้องส้วม ผบช. ชั้น 1, 3", type:"fixed",
-      cells:["พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)","พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)","พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)","พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)","พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)"]},
+      cells:["พลทหาร/ จ.ฐิติพงษ์, จ.วิศาล (กำกับดูแล)","พลทหาร/ จ.ฐิติพงษ์, จ.วิศาล (กำกับดูแล)","พลทหาร/ จ.ฐิติพงษ์, จ.วิศาล (กำกับดูแล)","พลทหาร/ จ.ฐิติพงษ์, จ.วิศาล (กำกับดูแล)","พลทหาร/ จ.ฐิติพงษ์, จ.วิศาล (กำกับดูแล)"]},
     {id:6, name:"ห้องทำงาน ผบ., รอง ผบ.,", type:"fixed",
-      cells:["เสมียนเวร นายทหารเวร","เสมียนเวร นายทหารเวร","เสมียนเวร นายทหารเวร","เสมียนเวร นายทหารเวร","เสมียนเวร นายทหารเวร"]}
+      cells:["เสมียนเวร, นายทหารเวร","เสมียนเวร, นายทหารเวร","เสมียนเวร, นายทหารเวร","เสมียนเวร, นายทหารเวร","เสมียนเวร, นายทหารเวร"]}
   ]
 };
 
@@ -704,8 +705,8 @@ function buildCurrentMonthWeeks(now){
 }
 /* Anchor point: last confirmed real-world assignment, so rotation stays
    correct no matter which month/week is currently displayed.
-   Monday 22 Jun 2026 (22 – 26 มิ.ย. 69): area1(id1)=กลุ่ม3, area2(id2)=กลุ่ม1, area3(id3)=กลุ่ม2 */
-const ROTATION_ANCHOR_MONDAY = new Date(2026, 5, 22);
+   Monday 29 Jun 2026 (29 มิ.ย. – 3 ก.ค. 69): area1(id1)=กลุ่ม3, area2(id2)=กลุ่ม1, area3(id3)=กลุ่ม2 */
+const ROTATION_ANCHOR_MONDAY = new Date(2026, 5, 29);
 const ROTATION_ANCHOR_GROUP = {1:3, 2:1, 3:2};
 function groupIdForWeekLabel(area, label, groupIds){
   const anchorGroupId = ROTATION_ANCHOR_GROUP[area.id];
@@ -1017,7 +1018,8 @@ function openCellRotateModal(ai, wi){
 document.getElementById("closeCellRotate").addEventListener("click", ()=> ovCellRotate.classList.remove("open"));
 document.getElementById("saveCellRotate").addEventListener("click", ()=>{
   const area = state.areas[cellCtx.ai];
-  area.cells[cellCtx.wi] = Number(document.getElementById("cellRotateSelect").value);
+  const val = document.getElementById("cellRotateSelect").value;
+  area.cells[cellCtx.wi] = Number(val);
   render();
   ovCellRotate.classList.remove("open");
 });
