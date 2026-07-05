@@ -1208,11 +1208,35 @@ function loadHtml2Canvas(){
 /* ---------- SAVE AS IMAGE ---------- */
 document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
   const target = document.querySelector(".wrap");
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  // IMPORTANT: on mobile, open the new tab synchronously, right here inside
+  // the click handler, BEFORE any "await". If we open it later (after
+  // loading html2canvas / building the canvas) the browser no longer treats
+  // it as a direct result of the tap and silently blocks it as a popup —
+  // which is why "save to mobile" was failing. We open a blank tab now and
+  // fill it in once the image is ready.
+  let mobileWin = null;
+  if(isMobile){
+    mobileWin = window.open("", "_blank");
+    if(mobileWin){
+      mobileWin.document.write(
+        '<!DOCTYPE html><html><head><meta charset="utf-8">'+
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'+
+        '<title>กำลังสร้างรูปภาพ...</title>'+
+        '<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;'+
+        'background:#0f1a1a;color:#fff;font-family:sans-serif;font-size:15px;text-align:center;padding:20px;}</style>'+
+        '</head><body>กำลังสร้างรูปภาพ กรุณารอสักครู่...</body></html>'
+      );
+    }
+  }
+
   toast("กำลังเตรียมตัวช่วยบันทึกรูปภาพ...");
   try{
     await loadHtml2Canvas();
   }catch(err){
     toast("โหลดตัวช่วยบันทึกรูปภาพไม่สำเร็จ ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+    if(mobileWin) mobileWin.close();
     return;
   }
   toast("กำลังสร้างรูปภาพ...");
@@ -1253,21 +1277,36 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     const dateStr = new Date().toISOString().slice(0,10);
     const filename = `ตารางเวรทำความสะอาด-${dateStr}.png`;
 
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-    if(!blob){ toast("สร้างรูปภาพไม่สำเร็จ"); return; }
-
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
     if(isMobile){
-      // Mobile: open the image directly so the user can long-press →
-      // "Save Image" / "บันทึกรูปภาพ" to save it straight into their photo
-      // album (ม้วนฟิล์ม). No share sheet involved.
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      toast("เปิดรูปภาพแล้ว กดค้างที่รูปแล้วเลือก \"บันทึกรูปภาพ\" เพื่อบันทึกลงอัลบั้ม");
-      setTimeout(()=> URL.revokeObjectURL(url), 60000);
+      // Fill the already-open tab with the image as a data URL (more
+      // reliable than a blob: URL across windows, especially inside
+      // in-app browsers like LINE). User long-presses it to save to their
+      // photo album (ม้วนฟิล์ม).
+      const dataUrl = canvas.toDataURL("image/png");
+      if(mobileWin && !mobileWin.closed){
+        mobileWin.document.open();
+        mobileWin.document.write(
+          '<!DOCTYPE html><html><head><meta charset="utf-8">'+
+          '<meta name="viewport" content="width=device-width, initial-scale=1">'+
+          '<title>'+filename+'</title>'+
+          '<style>body{margin:0;background:#0f1a1a;} '+
+          '.hint{position:fixed;top:0;left:0;right:0;color:#fff;font-family:sans-serif;font-size:14px;'+
+          'text-align:center;padding:10px 14px;background:rgba(0,0,0,.65);margin:0;z-index:1;} '+
+          '.imgwrap{padding-top:44px;} img{display:block;width:100%;height:auto;}</style>'+
+          '</head><body>'+
+          '<p class="hint">กดค้างที่รูปแล้วเลือก "บันทึกรูปภาพ" เพื่อบันทึกลงอัลบั้ม</p>'+
+          '<div class="imgwrap"><img src="'+dataUrl+'" alt="'+filename+'"></div>'+
+          '</body></html>'
+        );
+        mobileWin.document.close();
+        toast("เปิดรูปภาพแล้ว กดค้างที่รูปเพื่อบันทึกลงอัลบั้ม");
+      }else{
+        toast("เบราว์เซอร์บล็อกการเปิดหน้าต่างใหม่ กรุณาอนุญาต pop-up แล้วลองใหม่อีกครั้ง");
+      }
     }else{
       // Desktop: normal file download straight to disk.
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+      if(!blob){ toast("สร้างรูปภาพไม่สำเร็จ"); return; }
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -1279,6 +1318,7 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
   }catch(err){
     console.error(err);
     toast("เกิดข้อผิดพลาดในการบันทึกรูปภาพ");
+    if(mobileWin && !mobileWin.closed) mobileWin.close();
   }finally{
     offscreen.remove();
   }
