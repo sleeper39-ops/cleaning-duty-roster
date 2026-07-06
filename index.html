@@ -216,7 +216,7 @@
   .add-row-btn-cell{text-align:center;padding:14px;}
 
   /* Group legend */
-  .groups-title{font-size:18px;font-weight:700;margin:8px 0 12px;text-decoration:underline;text-underline-offset:4px;}
+  .groups-title{font-size:18px;font-weight:700;margin:8px 0 12px;text-decoration:underline;text-underline-offset:4px;text-align:center;}
   .groups-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -1414,6 +1414,61 @@ async function bootstrap(){
   saveState();
 }
 bootstrap();
+
+/* ---------- AUTO CAPTURE MODE (for scheduled screenshot/LINE push) ----------
+   Visiting this page with "?capture=1" makes it automatically lay itself
+   out for a full, clean screenshot (no toolbar, full-width table, groups
+   shown in one row) with no user interaction needed — used by a headless
+   screenshot service (e.g. driven from Google Apps Script) to grab a daily
+   image and push it to LINE. Once ready, a hidden #capture-ready marker
+   element is added to the page so the screenshot tool knows to wait for it
+   before taking the shot (avoids capturing a blank/half-loaded page). */
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get("capture") !== "1") return;
+
+  function applyCaptureLayoutAndMark(){
+    const toolbar = document.querySelector(".toolbar");
+    if(toolbar) toolbar.style.display = "none";
+
+    const wideEls = document.querySelectorAll(".wrap, .table-card");
+    wideEls.forEach(el=>{
+      el.style.maxWidth = "none";
+      el.style.width = "max-content";
+      el.style.overflow = "visible";
+      el.style.overflowX = "visible";
+    });
+
+    const groupsGrid = document.getElementById("groupsGrid");
+    if(groupsGrid){
+      groupsGrid.style.gridTemplateColumns = "repeat(auto-fit, minmax(220px, 1fr))";
+    }
+
+    // Give the browser two paint frames to finish reflowing the new layout
+    // before telling the screenshot tool we're ready.
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        const marker = document.createElement("div");
+        marker.id = "capture-ready";
+        marker.style.display = "none";
+        document.body.appendChild(marker);
+      });
+    });
+  }
+
+  // Data loads asynchronously from Firebase inside bootstrap(). Poll until
+  // the group list has actually been rendered before resizing anything or
+  // signaling readiness, so the screenshot never catches an empty page.
+  function waitForData(){
+    const grid = document.getElementById("groupsGrid");
+    if(grid && grid.children.length > 0){
+      applyCaptureLayoutAndMark();
+    }else{
+      setTimeout(waitForData, 150);
+    }
+  }
+  waitForData();
+})();
 </script>
 </body>
 </html>
