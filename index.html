@@ -216,7 +216,16 @@
   .add-row-btn-cell{text-align:center;padding:14px;}
 
   /* Group legend */
-  .groups-title{font-size:18px;font-weight:700;margin:8px 0 12px;text-decoration:underline;text-underline-offset:4px;}
+  .groups-title{
+    font-size:18px;
+    font-weight:700;
+    margin:8px auto 12px;
+    text-decoration:underline;
+    text-underline-offset:4px;
+    text-align:center;
+    width:100%;
+    display:block;
+  }
   .groups-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -322,92 +331,15 @@
     <table id="rosterTable">
       <thead>
         <tr id="headRow">
-          <th class="area-head">พื้นที่รับผิดชอบ</th><th>
-      <div class="col-head">
-        <span class="week-label">18 – 22 พ.ค. 69</span>
-      </div></th><th>
-      <div class="col-head">
-        <span class="week-label">25 – 29 พ.ค. 69</span>
-      </div></th><th>
-      <div class="col-head">
-        <span class="week-label">1 – 5 มิ.ย. 69</span>
-      </div></th><th>
-      <div class="col-head">
-        <span class="week-label">8 – 12 มิ.ย. 69</span>
-      </div></th><th>
-      <div class="col-head">
-        <span class="week-label">15 – 19 มิ.ย. 69</span>
-      </div></th><th>
-      <div class="col-head">
-        <span class="week-label">22 – 26 มิ.ย. 69</span>
-      </div></th><th>
-      <div class="col-head">
-        <span class="week-label">29 มิ.ย. – 3 ก.ค. 69</span>
-      </div></th>
+          <th class="area-head">พื้นที่รับผิดชอบ</th>
         </tr>
       </thead>
-      <tbody id="bodyTbl"><tr><td class="area-cell">
-      <div class="area-row">
-        <div>ลานจอดรถหน้าต้นโพธิ์ตลอดแนว พระพุทธ, ม้าหินอ่อน
-          <div><span class="area-tag ">หมุนเวียนกลุ่ม</span></div>
-        </div>
-        <div class="area-actions">
-          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="0">✏️</button>
-        </div>
-      </div></td><td class="data-cell" data-area-idx="0" data-week-idx="0"><strong>กลุ่ม 1</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="1"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="2"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="3"><strong>กลุ่ม 2</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="4"><strong>กลุ่ม 1</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="5"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="0" data-week-idx="6"><strong>กลุ่ม 3</strong></td></tr><tr><td class="area-cell">
-      <div class="area-row">
-        <div>ห้องกาแฟ, ห้องน้ำด้านใน
-          <div><span class="area-tag ">หมุนเวียนกลุ่ม</span></div>
-        </div>
-        <div class="area-actions">
-          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="1">✏️</button>
-        </div>
-      </div></td><td class="data-cell" data-area-idx="1" data-week-idx="0"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="1"><strong>กลุ่ม 2</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="2"><strong>กลุ่ม 1</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="3"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="4"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="5"><strong>กลุ่ม 2</strong></td><td class="data-cell" data-area-idx="1" data-week-idx="6"><strong>กลุ่ม 1</strong></td></tr><tr><td class="area-cell">
-      <div class="area-row">
-        <div>ระเบียงด้านหน้า, ห้องประชุม
-          <div><span class="area-tag ">หมุนเวียนกลุ่ม</span></div>
-        </div>
-        <div class="area-actions">
-          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="2">✏️</button>
-        </div>
-      </div></td><td class="data-cell" data-area-idx="2" data-week-idx="0"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="1"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="2"><strong>กลุ่ม 2</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="3"><strong>กลุ่ม 1</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="4"><strong>กลุ่ม 4</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="5"><strong>กลุ่ม 3</strong></td><td class="data-cell" data-area-idx="2" data-week-idx="6"><strong>กลุ่ม 2</strong></td></tr><tr><td class="area-cell">
-      <div class="area-row">
-        <div>โต๊ะทานข้าวด้านหลัง พื้นที่ด้านหลังซักผ้า, ล้างจาน, ห้องอาหาร
-          <div><span class="area-tag fixed">ข้อความคงที่</span></div>
-        </div>
-        <div class="area-actions">
-          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="3">✏️</button>
-        </div>
-      </div></td><td class="data-cell" data-area-idx="3" data-week-idx="0">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="1">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="2">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="3">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="4">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="5">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td><td class="data-cell" data-area-idx="3" data-week-idx="6">ผู้ที่ใช้สถานที่ จ.สิทธิพงษ์, ส.เมธี</td></tr><tr><td class="area-cell">
-      <div class="area-row">
-        <div>ห้องโถงหน้าห้อง ผบช./ ห้องน้ำห้องส้วม ผบช. ชั้น 1, 3
-          <div><span class="area-tag fixed">ข้อความคงที่</span></div>
-        </div>
-        <div class="area-actions">
-          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="4">✏️</button>
-        </div>
-      </div></td><td class="data-cell" data-area-idx="4" data-week-idx="0">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="1">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="2">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="3">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="4">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="5">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td><td class="data-cell" data-area-idx="4" data-week-idx="6">พลทหาร จ.ฐิติพงษ์/จ.วิศาล (กำกับดูแล)</td></tr><tr><td class="area-cell">
-      <div class="area-row">
-        <div>ห้องทำงาน ผบ., รอง ผบ.,
-          <div><span class="area-tag fixed">ข้อความคงที่</span></div>
-        </div>
-        <div class="area-actions">
-          <button class="btn-ghost btn-sm" data-act="editarea" data-idx="5">✏️</button>
-        </div>
-      </div></td><td class="data-cell" data-area-idx="5" data-week-idx="0">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="1">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="2">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="3">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="4">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="5">เสมียนเวร นายทหารเวร</td><td class="data-cell" data-area-idx="5" data-week-idx="6">เสมียนเวร นายทหารเวร</td></tr></tbody>
+      <tbody id="bodyTbl"></tbody>
     </table>
   </div>
 
   <div class="groups-title">กลุ่มรายชื่อปฏิบัติเวร</div>
-  <div class="groups-grid" id="groupsGrid"><div class="group-card">
-      <h3>กลุ่ม 1</h3>
-      <ul><li>จ.ชัยฤทธิ์</li><li>จ.คำสอน</li><li>ส.ณรงค์กร</li><li>ส.กฤษณัส</li><li>ส.สรรเสริญ</li><li>ส.อนุชิต</li><li>ส.ปิยะพงษ์</li><li>จ.อนุทิน</li></ul></div><div class="group-card">
-      <h3>กลุ่ม 2</h3>
-      <ul><li>จ.ณัฐกิตติ์</li><li>ส.มีชัย</li><li>จ.อัมฤทธิ์</li><li>ส.ปรัชญา</li><li>ส.จักรกฤษณ์</li><li>ส.วรัญญู</li><li>ส.สมเกียรติ</li></ul></div><div class="group-card">
-      <h3>กลุ่ม 3</h3>
-      <ul><li>จ.พรหมมาส</li><li>ส.เสกสรร</li><li>ส.สุดใจ</li><li>ส.วงกต</li><li>ส.อดิศร</li><li>ส.ณัฐเอก</li><li>ส.ชาติชาย</li><li>จ.ธีระ</li></ul></div><div class="group-card">
-      <h3>กลุ่ม 4</h3>
-      <ul><li>จ.ไพรพณา</li><li>จ.กิตติ</li><li>จ.วันเฉลิม</li><li>ส.ปิยะณัฐ</li><li>ส.อิสรพงษ์</li><li>ส.วิเชียร</li><li>จ.สมควร</li><li>จ.ทินกร</li></ul></div></div>
+  <div class="groups-grid" id="groupsGrid"></div>
 
 </div>
 
@@ -544,17 +476,11 @@ const defaultState = {
 let state, nextAreaId, nextGroupId;
 
 /* ---------- FIREBASE PERSISTENCE (REST API, no external SDK needed) ---------- */
-// Realtime Database exposes a plain HTTPS REST API, so we talk to it directly
-// with fetch() instead of loading the firebase-*.js SDK from gstatic.com.
-// This avoids failures when that CDN is blocked/unreachable on restrictive
-// networks (a common issue on office/military networks) — only your own
-// Firebase database domain below needs to be reachable.
 const FIREBASE_DB_URL = "https://cleaning-duty-roster-6ba83-default-rtdb.asia-southeast1.firebasedatabase.app";
-// Change this if you ever need multiple independent boards in the same Firebase project.
 const STATE_PATH = "cleaningDutyRoster/state";
 const STATE_URL = `${FIREBASE_DB_URL}/${STATE_PATH}.json`;
 
-let firebaseReady = true; // optimistic; flips to false only if a request actually fails
+let firebaseReady = true;
 
 function setDbStatus(mode, detail){
   const el = document.getElementById("dbStatus");
@@ -598,7 +524,7 @@ async function fetchSavedState(){
     const data = await res.json();
     firebaseReady = true;
     setDbStatus("ok");
-    return data; // null if nothing saved yet
+    return data;
   }catch(err){
     console.error(err);
     firebaseReady = false;
@@ -652,7 +578,6 @@ function groupById(id){ return state.groups.find(g=>g.id===id); }
 function render(){
   document.getElementById("bannerText").value = state.banner;
 
-  // header
   const currentIdx = getCurrentWeekIndex();
   const upcomingIdx = getUpcomingWeekIndex(currentIdx);
   const headRow = document.getElementById("headRow");
@@ -672,7 +597,6 @@ function render(){
     headRow.appendChild(th);
   });
 
-  // body
   const tbody = document.getElementById("bodyTbl");
   tbody.innerHTML = "";
   state.areas.forEach((area, ai)=>{
@@ -708,7 +632,6 @@ function render(){
     tbody.appendChild(tr);
   });
 
-  // groups grid
   const grid = document.getElementById("groupsGrid");
   grid.innerHTML = "";
   state.groups.forEach(g=>{
@@ -729,7 +652,7 @@ function escapeHtml(s){
 /* ---------- AUTO WEEK (MON–FRI) GENERATION ---------- */
 const THAI_MONTHS_ABBR = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
 function mondayOf(d){
-  const day = d.getDay(); // 0=Sun..6=Sat
+  const day = d.getDay();
   const diff = (day === 0 ? -6 : 1 - day);
   const m = new Date(d);
   m.setDate(d.getDate() + diff);
@@ -771,7 +694,6 @@ function parseWeekLabelToRange(label){
   const monthIdx = {};
   THAI_MONTHS_ABBR.forEach((m,i)=>{ monthIdx[m]=i; });
   const cleaned = String(label).trim();
-  // Cross-month: "D MMM – D MMM YY"
   let m = cleaned.match(/^(\d{1,2})\s*([ก-๙.]+)\s*[–-]\s*(\d{1,2})\s*([ก-๙.]+)\s*(\d{2})$/);
   if(m){
     const d1=Number(m[1]), mo1=monthIdx[m[2]], d2=Number(m[3]), mo2=monthIdx[m[4]], ceYear=1957+Number(m[5]);
@@ -781,7 +703,6 @@ function parseWeekLabelToRange(label){
     const end = new Date(ceYear, mo2, d2, 23,59,59,999);
     return {start, end};
   }
-  // Same month: "D – D MMM YY"
   m = cleaned.match(/^(\d{1,2})\s*[–-]\s*(\d{1,2})\s*([ก-๙.]+)\s*(\d{2})$/);
   if(m){
     const d1=Number(m[1]), d2=Number(m[2]), mo=monthIdx[m[3]], ceYear=1957+Number(m[4]);
@@ -800,9 +721,6 @@ function getCurrentWeekIndex(){
   }
   return -1;
 }
-// Finds a week that's about to start within `thresholdDays` days (and hasn't
-// started yet), so users get a heads-up before their duty week arrives.
-// Skips the currently-active week since that already has its own highlight.
 function getUpcomingWeekIndex(currentIdx, thresholdDays = 2){
   const now = new Date();
   let bestIdx = -1, bestDiff = Infinity;
@@ -833,9 +751,6 @@ function buildCurrentMonthWeeks(now){
   }
   return weeks;
 }
-/* Anchor point: last confirmed real-world assignment, so rotation stays
-   correct no matter which month/week is currently displayed.
-   Monday 29 Jun 2026 (29 มิ.ย. – 3 ก.ค. 69): area1(id1)=กลุ่ม3, area2(id2)=กลุ่ม1, area3(id3)=กลุ่ม2 */
 const ROTATION_ANCHOR_MONDAY = new Date(2026, 5, 29);
 const ROTATION_ANCHOR_GROUP = {1:3, 2:1, 3:2};
 function groupIdForWeekLabel(area, label, groupIds){
@@ -887,7 +802,6 @@ function initDefaultStateForCurrentMonth(){
   });
 }
 function nextRotateGroupId(area){
-
   const groupIds = state.groups.map(g=>g.id);
   const n = groupIds.length;
   if(n === 0) return null;
@@ -909,7 +823,7 @@ function nextRotateGroupId(area){
 function defaultAutoWeekStart(){
   if(state.lastGeneratedEnd){
     const d = new Date(state.lastGeneratedEnd + "T00:00:00");
-    d.setDate(d.getDate() + 3); // Friday -> following Monday
+    d.setDate(d.getDate() + 3);
     return d.toISOString().slice(0,10);
   }
   return mondayOf(new Date()).toISOString().slice(0,10);
@@ -923,7 +837,6 @@ document.getElementById("bannerText").addEventListener("change", e=>{
 });
 
 /* ---------- HEADER / CELL DELEGATION ---------- */
-
 document.getElementById("bodyTbl").addEventListener("click", e=>{
   const editBtn = e.target.closest('button[data-act="editarea"]');
   if(editBtn){ openAreaModal(Number(editBtn.dataset.idx)); return; }
@@ -1219,20 +1132,9 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
   toast("กำลังสร้างรูปภาพ...");
 
   if(isMobile){
-    // ----- MOBILE: original flow, unchanged -----
     const toolbar = document.querySelector(".toolbar");
     toolbar.classList.add("hide-for-capture");
 
-    // Temporarily resize the target and any horizontally-scrollable containers
-    // (e.g. the table wrapper) to their full natural content width. This makes
-    // sure the whole table (every column, not just what's scrolled into view)
-    // is captured, while keeping everything properly sized/centered instead of
-    // being left-aligned inside an oversized canvas.
-    // The @media (max-width:640px) rule collapses .groups-grid to a single
-    // column based on the actual phone viewport width — widening the
-    // container doesn't override a viewport media query. Force the
-    // multi-column layout (same as desktop) just for the capture so the
-    // saved image shows the groups side-by-side in one row, like on desktop.
     const groupsGrid = target.querySelector("#groupsGrid, .groups-grid");
     const prevGridCols = groupsGrid ? groupsGrid.style.gridTemplateColumns : null;
     if(groupsGrid){
@@ -1257,7 +1159,6 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     });
 
     try{
-      // small delay so the toolbar hide + width changes reflow before capture
       await new Promise(r=>setTimeout(r, 50));
       const canvas = await html2canvas(target, {backgroundColor:"#F2FAF8", scale:2, useCORS:true});
       const dateStr = new Date().toISOString().slice(0,10);
@@ -1268,8 +1169,6 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
 
       const file = new File([blob], filename, {type:"image/png"});
 
-      // Mobile / any device that supports native share-with-files: opens the
-      // "Save Image" / "Save to Photos" sheet directly.
       if(navigator.canShare && navigator.canShare({files:[file]})){
         try{
           await navigator.share({files:[file], title: filename});
@@ -1280,8 +1179,6 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
           }
         }
       }else{
-        // Mobile without file-share support: open the image so the user can
-        // long-press → "Save Image" / "บันทึกรูปภาพ" to the camera roll.
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
         toast("เปิดรูปภาพแล้ว กดค้างที่รูปเพื่อบันทึกลงมือถือ");
@@ -1304,8 +1201,6 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
       }
     }
   }else{
-    // ----- DESKTOP: latest flow — capture off-screen so the live page never
-    // hides or resizes, then download the file straight to disk. -----
     const clone = target.cloneNode(true);
     const offscreen = document.createElement("div");
     offscreen.style.position = "fixed";
@@ -1352,29 +1247,18 @@ document.getElementById("btnSaveImage").addEventListener("click", async ()=>{
     }
   }
 });
-/* close modals on backdrop click */
 document.querySelectorAll(".overlay").forEach(ov=>{
   ov.addEventListener("click", e=>{ if(e.target === ov) ov.classList.remove("open"); });
 });
 
 async function bootstrap(){
-  // Always compute what "this month" should look like from the rotation
-  // formula first — this is the fallback/reference used whenever there's
-  // no saved data, or whenever the saved week list has aged out (new month).
   initDefaultStateForCurrentMonth();
 
   const saved = await fetchSavedState();
 
   if(saved && Array.isArray(saved.weeks) && arraysEqual(saved.weeks, defaultState.weeks)){
-    // Same set of weeks as last time (nothing rolled over) — use the saved
-    // data as-is so every manual edit (cells, names, members, banner, custom
-    // areas) survives a reload untouched.
     state = saved;
   }else if(saved){
-    // A new month's weeks are needed. Start from the freshly-computed
-    // rotation (guaranteed correct for the new weeks), then layer the
-    // admin's persisted edits (banner text, group names/members, area
-    // names, fixed-area text, any custom areas) back on top.
     state = JSON.parse(JSON.stringify(defaultState));
     if(saved.banner) state.banner = saved.banner;
     if(Array.isArray(saved.groups) && saved.groups.length) state.groups = saved.groups;
@@ -1391,11 +1275,8 @@ async function bootstrap(){
           const lastVal = (Array.isArray(sa.cells) && sa.cells.length) ? sa.cells[sa.cells.length-1] : "";
           merged.cells = state.weeks.map(()=> lastVal);
         }
-        // rotate-type areas keep the formula-computed cells from freshArea
         return merged;
       });
-      // Carry over any custom areas the admin added that aren't part of the
-      // built-in rotation formula (continue their rotation/text forward).
       saved.areas.forEach(sa=>{
         if(!state.areas.find(a=> a.id === sa.id)){
           const extra = {...sa};
@@ -1415,14 +1296,7 @@ async function bootstrap(){
 }
 bootstrap();
 
-/* ---------- AUTO CAPTURE MODE (for scheduled screenshot/LINE push) ----------
-   Visiting this page with "?capture=1" makes it automatically lay itself
-   out for a full, clean screenshot (no toolbar, full-width table, groups
-   shown in one row) with no user interaction needed — used by a headless
-   screenshot service (e.g. driven from Google Apps Script) to grab a daily
-   image and push it to LINE. Once ready, a hidden #capture-ready marker
-   element is added to the page so the screenshot tool knows to wait for it
-   before taking the shot (avoids capturing a blank/half-loaded page). */
+/* ---------- AUTO CAPTURE MODE (for scheduled screenshot/LINE push) ---------- */
 (function(){
   const params = new URLSearchParams(window.location.search);
   if(params.get("capture") !== "1") return;
@@ -1444,8 +1318,6 @@ bootstrap();
       groupsGrid.style.gridTemplateColumns = "repeat(auto-fit, minmax(220px, 1fr))";
     }
 
-    // Give the browser two paint frames to finish reflowing the new layout
-    // before telling the screenshot tool we're ready.
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
         const marker = document.createElement("div");
@@ -1456,9 +1328,6 @@ bootstrap();
     });
   }
 
-  // Data loads asynchronously from Firebase inside bootstrap(). Poll until
-  // the group list has actually been rendered before resizing anything or
-  // signaling readiness, so the screenshot never catches an empty page.
   function waitForData(){
     const grid = document.getElementById("groupsGrid");
     if(grid && grid.children.length > 0){
